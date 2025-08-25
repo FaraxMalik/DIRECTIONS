@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "447809732811",
+    "project_id": "careercounseling-7133e",
+    "storage_bucket": "careercounseling-7133e.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:447809732811:android:313b74916e057213f09b4e",
+        "android_client_info": {
+          "package_name": "com.example.career_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAoGxdD1f6c07m1c0lKX_VFyueKmME4Ps0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
