@@ -19,7 +19,7 @@ class DashboardScreen extends StatelessWidget {
                 children: [
                   Icon(Icons.dashboard, size: 80, color: Colors.indigo),
                   SizedBox(height: 24),
-                  Text('Welcome to Career Guidance!', style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold)),
+                  Text('Welcome to DIRECTIONS!', style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold)),
                   SizedBox(height: 16),
                   Text('Start your journey by taking the quiz or view your profile.', style: TextStyle(fontSize: 18, color: Colors.grey[700]), textAlign: TextAlign.center),
                   SizedBox(height: 32),

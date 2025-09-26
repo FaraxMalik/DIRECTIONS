@@ -1,4 +1,4 @@
-package com.example.career_app
+package com.example.directions
 
 import io.flutter.embedding.android.FlutterActivity
 

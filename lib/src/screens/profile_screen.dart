@@ -1,12 +1,64 @@
 
 
 import 'package:flutter/material.dart';
-import 'dart:ui';
+import 'package:provider/provider.dart';
+import '../services/profile_service.dart';
 import '../models/user_profile.dart';
+import '../widgets/connection_status_widget.dart';
+import '../widgets/firebase_connection_dialog.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
+  const ProfileScreen({super.key});
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  final _nameCtrl = TextEditingController();
+  final _ageCtrl = TextEditingController();
+  final _genderCtrl = TextEditingController();
+  bool _saving = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _nameCtrl.text = UserProfile.name;
+    _ageCtrl.text = UserProfile.age;
+    _genderCtrl.text = UserProfile.gender;
+  }
+
+  Future<void> _save() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
+    setState(() => _saving = true);
+    final firestore = FirebaseFirestore.instance;
+
+    Future<void> attempt() async {
+      await firestore.collection('users').doc(user.uid).set({
+        'email': user.email ?? '',
+        'displayName': _nameCtrl.text.trim().isEmpty ? null : _nameCtrl.text.trim(),
+        'age': _ageCtrl.text.trim(),
+        'gender': _genderCtrl.text.trim(),
+      }, SetOptions(merge: true));
+    }
+
+    try {
+      await attempt();
+    } catch (e) {
+      if (e.toString().contains('unavailable') || e.toString().contains('network') || e.toString().contains('deadline')) {
+        await Future.delayed(const Duration(milliseconds: 800));
+        await attempt();
+      } else {
+        rethrow;
+      }
+    } finally {
+      if (mounted) setState(() => _saving = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final user = FirebaseAuth.instance.currentUser;
     return Container(
       color: Color(0xFFB3E5FC),
       child: Center(
@@ -36,10 +88,53 @@ class ProfileScreen extends StatelessWidget {
                         SizedBox(height: 24),
                         Divider(thickness: 1.5),
                         SizedBox(height: 16),
-                        _profileRow('Email', UserProfile.email),
-                        _profileRow('Name', UserProfile.name),
-                        _profileRow('Age', UserProfile.age),
-                        _profileRow('Gender', UserProfile.gender),
+                        StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+                          stream: user == null
+                              ? const Stream.empty()
+                              : FirebaseFirestore.instance.collection('users').doc(user.uid).snapshots(),
+                          builder: (context, snap) {
+                            final data = snap.data?.data();
+                            final email = data?['email'] ?? user?.email ?? '';
+                            final name = data?['displayName'] ?? _nameCtrl.text;
+                            final age = data?['age'] ?? _ageCtrl.text;
+                            final gender = data?['gender'] ?? _genderCtrl.text;
+                            return Column(
+                              children: [
+                                _profileRow('Email', email),
+                                TextField(
+                                  controller: _nameCtrl,
+                                  decoration: InputDecoration(labelText: 'Name'),
+                                  textInputAction: TextInputAction.next,
+                                ),
+                                SizedBox(height: 12),
+                                TextField(
+                                  controller: _ageCtrl,
+                                  decoration: InputDecoration(labelText: 'Age'),
+                                  keyboardType: TextInputType.number,
+                                  textInputAction: TextInputAction.next,
+                                ),
+                                SizedBox(height: 12),
+                                TextField(
+                                  controller: _genderCtrl,
+                                  decoration: InputDecoration(labelText: 'Gender'),
+                                  textInputAction: TextInputAction.done,
+                                ),
+                                SizedBox(height: 20),
+                                SizedBox(
+                                  width: double.infinity,
+                                  child: ElevatedButton(
+                                    onPressed: _saving ? null : _save,
+                                    child: Text(_saving ? 'Saving...' : 'Save'),
+                                  ),
+                                ),
+                                SizedBox(height: 16),
+                                _profileRow('Live Name', name),
+                                _profileRow('Live Age', age),
+                                _profileRow('Live Gender', gender),
+                              ],
+                            );
+                          },
+                        ),
                       ],
                     ),
                   ),

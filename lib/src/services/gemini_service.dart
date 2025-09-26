@@ -31,10 +31,27 @@ class GeminiService {
   }
 
   String _buildPrompt(List<Map<String, dynamic>> answers) {
-    String prompt = 'Based on the following answers, suggest a suitable career and provide a short description.\n';
+    final buffer = StringBuffer();
+    buffer.writeln(
+      'You are an expert Career Counselor with years of experience helping students choose the right, realistic career paths and succeed. '
+      'You are given the following questionnaire answers. Your task: suggest ONE best-suited career from today\'s job market and briefly explain why it fits.'
+    );
+    buffer.writeln();
+    buffer.writeln('Output requirements:');
+    buffer.writeln('- Be realistic and specific (e.g., Data Analyst, UX Designer, Fashion Designer, Lawyer, Entrepreneur, Mechanical Engineer; not generic).');
+    buffer.writeln('- Align the rationale directly to the answers provided.');
+    buffer.writeln('- Keep it concise and professional; no fluff or disclaimers.');
+    buffer.writeln('- Limit explanation to 2–4 sentences.');
+    buffer.writeln();
+    buffer.writeln('Output format:');
+    buffer.writeln('Title: <career>');
+    buffer.writeln('Reason: <2–4 sentences explaining the fit>');
+    buffer.writeln();
+    buffer.writeln('Answers:');
     for (int i = 0; i < answers.length; i++) {
-      prompt += 'Q${i + 1}: ${answers[i]['question']}\nA: ${answers[i]['answer']}\n';
+      buffer.writeln('Q${i + 1}: ${answers[i]['question']}');
+      buffer.writeln('A: ${answers[i]['answer']}');
     }
-    return prompt;
+    return buffer.toString();
   }
 }

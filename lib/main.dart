@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'src/screens/login_screen.dart';
 import 'src/screens/splash_screen.dart';
 import 'src/screens/home_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  runApp(CareerApp());
+  runApp(const CareerApp());
 }
 
 class CareerApp extends StatelessWidget {
+  const CareerApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
