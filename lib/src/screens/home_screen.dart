@@ -5,8 +5,11 @@ import 'dashboard_screen.dart';
 import 'quiz_screen.dart';
 import 'results_screen.dart';
 import 'profile_screen.dart';
+import 'journaling_screen.dart';
 
 class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key});
+
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
@@ -17,6 +20,7 @@ class _HomeScreenState extends State<HomeScreen> {
     DashboardScreen(),
     QuizScreen(),
     ResultsScreen(),
+    JournalingScreen(),
     ProfileScreen(),
   ];
 
@@ -53,6 +57,10 @@ class _HomeScreenState extends State<HomeScreen> {
             BottomNavigationBarItem(
               icon: Icon(Icons.emoji_events, color: Colors.white),
               label: 'Results',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.book, color: Colors.white),
+              label: 'Journal',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.person, color: Colors.white),

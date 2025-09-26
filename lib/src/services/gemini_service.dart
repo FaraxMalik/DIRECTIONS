@@ -6,6 +6,33 @@ class GeminiService {
   static const String model = 'gemini-1.5-flash';
   static const String endpoint = 'https://generativelanguage.googleapis.com/v1beta/models/$model:generateContent?key=$apiKey';
 
+  Future<String> getCareerSuggestionWithJournal(
+    List<Map<String, dynamic>> answers, 
+    Map<String, dynamic>? journalInsights
+  ) async {
+    final prompt = _buildPromptWithJournal(answers, journalInsights);
+    final body = jsonEncode({
+      'contents': [
+        {
+          'parts': [
+            {'text': prompt}
+          ]
+        }
+      ]
+    });
+    final response = await http.post(
+      Uri.parse(endpoint),
+      headers: {'Content-Type': 'application/json'},
+      body: body,
+    );
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      return data['candidates']?[0]?['content']?['parts']?[0]?['text'] ?? 'No career found.';
+    } else {
+      return 'Error: ${response.statusCode}';
+    }
+  }
+
   Future<String> getCareerSuggestion(List<Map<String, dynamic>> answers) async {
     final prompt = _buildPrompt(answers);
     final body = jsonEncode({
@@ -28,6 +55,55 @@ class GeminiService {
     } else {
       return 'Error: ${response.statusCode}';
     }
+  }
+
+  String _buildPromptWithJournal(List<Map<String, dynamic>> answers, Map<String, dynamic>? journalInsights) {
+    final buffer = StringBuffer();
+    buffer.writeln(
+      'You are an expert Career Counselor with years of experience helping students choose the right, realistic career paths and succeed. '
+      'You are given questionnaire answers AND journal insights from the user. Your task: suggest ONE best-suited career from today\'s job market and briefly explain why it fits.'
+    );
+    buffer.writeln();
+    
+    if (journalInsights != null && journalInsights.isNotEmpty) {
+      buffer.writeln('JOURNAL INSIGHTS:');
+      buffer.writeln('Total entries: ${journalInsights['totalEntries']}');
+      buffer.writeln('Writing frequency: ${journalInsights['writingFrequency']?.toStringAsFixed(2)} entries/day');
+      buffer.writeln('Dominant mood: ${journalInsights['dominantMood']}');
+      buffer.writeln('Average words per entry: ${journalInsights['averageWordsPerEntry']}');
+      if (journalInsights['commonTags'] != null) {
+        buffer.writeln('Common themes: ${(journalInsights['commonTags'] as List).join(', ')}');
+      }
+      buffer.writeln();
+      buffer.writeln('JOURNAL EXCERPT (analyze thinking patterns, communication style, interests):');
+      final allText = journalInsights['allText'] as String? ?? '';
+      // Limit journal text to 1000 characters to avoid token limits
+      final truncatedText = allText.length > 1000 ? '${allText.substring(0, 1000)}...' : allText;
+      buffer.writeln(truncatedText);
+      buffer.writeln();
+    }
+    
+    buffer.writeln('Output requirements:');
+    buffer.writeln('- Use BOTH quiz answers AND journal insights to make recommendation');
+    buffer.writeln('- Journal shows personality, thinking patterns, communication style, interests, and emotional intelligence');
+    buffer.writeln('- Be realistic and specific (e.g., Data Analyst, UX Designer, Fashion Designer, Lawyer, Entrepreneur, Mechanical Engineer; not generic).');
+    buffer.writeln('- Align the rationale directly to BOTH the quiz answers AND journal patterns.');
+    buffer.writeln('- Keep it concise and professional; no fluff or disclaimers.');
+    buffer.writeln('- Limit explanation to 3–5 sentences.');
+    buffer.writeln();
+    buffer.writeln('Output format:');
+    buffer.writeln('Title: <career>');
+    buffer.writeln('Reason: <3–5 sentences explaining the fit based on quiz AND journal>');
+    buffer.writeln();
+    buffer.writeln('QUIZ ANSWERS:');
+    
+    for (int i = 0; i < answers.length; i++) {
+      final answer = answers[i];
+      buffer.writeln('${i + 1}. Q: ${answer['question']}');
+      buffer.writeln('   A: ${answer['answer']}');
+    }
+    
+    return buffer.toString();
   }
 
   String _buildPrompt(List<Map<String, dynamic>> answers) {

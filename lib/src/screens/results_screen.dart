@@ -1,8 +1,8 @@
 
+import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import '../services/results_service.dart';
-import '../widgets/connection_status_widget.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class ResultsScreen extends StatelessWidget {
   const ResultsScreen({super.key});
@@ -37,7 +37,7 @@ class ResultsScreen extends StatelessWidget {
                 child: BackdropFilter(
                   filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
                   child: Card(
-                    color: Colors.white.withOpacity(0.85),
+                    color: Colors.white.withValues(alpha: 0.85),
                     elevation: 12,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(32)),
                     child: Padding(
@@ -68,6 +68,7 @@ class ResultsScreen extends StatelessWidget {
                                   );
                                 }).toList(),
                               ),
+                            ),
                     ),
                   ),
                 ),

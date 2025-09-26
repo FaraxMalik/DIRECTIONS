@@ -9,6 +9,8 @@ class QuizResultStore {
 }
 
 class QuizScreen extends StatefulWidget {
+  const QuizScreen({super.key});
+
   @override
   State<QuizScreen> createState() => _QuizScreenState();
 }
@@ -98,7 +100,7 @@ class _QuizScreenState extends State<QuizScreen> {
             child: BackdropFilter(
               filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
               child: Card(
-                color: Colors.white.withOpacity(0.85),
+                color: Colors.white.withValues(alpha: 0.85),
                 elevation: 12,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(32)),
                 child: Padding(

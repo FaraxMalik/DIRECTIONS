@@ -1,10 +1,14 @@
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../services/auth_service.dart';
+import '../services/profile_service.dart';
 import '../models/user_profile.dart';
 import 'home_screen.dart';
 
 class SignupScreen extends StatefulWidget {
+  const SignupScreen({super.key});
+
   @override
   State<SignupScreen> createState() => _SignupScreenState();
 }
@@ -28,12 +32,19 @@ class _SignupScreenState extends State<SignupScreen> {
       // Save user info locally for now (can be extended to Firebase later)
       final user = await _auth.signUp(emailController.text.trim(), passwordController.text.trim());
       if (user != null) {
-        // Save name, age, gender in a static user profile (can be extended)
-        UserProfile.name = nameController.text.trim();
-        UserProfile.age = ageController.text.trim();
-        UserProfile.gender = gender;
-        UserProfile.email = emailController.text.trim();
-        Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => HomeScreen()));
+        // Save profile information through ProfileService
+        final profileService = Provider.of<ProfileService>(context, listen: false);
+        final profile = UserProfile(
+          uid: user.uid,
+          email: emailController.text.trim(),
+          displayName: nameController.text.trim(),
+          age: ageController.text.trim(),
+          gender: gender,
+        );
+        await profileService.saveProfile(profile);
+        if (mounted) {
+          Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => HomeScreen()));
+        }
       } else {
         setState(() => _error = 'Could not sign up');
       }

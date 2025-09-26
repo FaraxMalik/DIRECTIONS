@@ -1,11 +1,10 @@
 
-
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../services/profile_service.dart';
-import '../models/user_profile.dart';
-import '../widgets/connection_status_widget.dart';
-import '../widgets/firebase_connection_dialog.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -22,9 +21,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   void initState() {
     super.initState();
-    _nameCtrl.text = UserProfile.name;
-    _ageCtrl.text = UserProfile.age;
-    _genderCtrl.text = UserProfile.gender;
+    final profileService = Provider.of<ProfileService>(context, listen: false);
+    final profile = profileService.profile;
+    _nameCtrl.text = profile?.displayName ?? '';
+    _ageCtrl.text = profile?.age?.toString() ?? '';
+    _genderCtrl.text = profile?.gender ?? '';
   }
 
   Future<void> _save() async {
@@ -70,7 +71,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               child: BackdropFilter(
                 filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
                 child: Card(
-                  color: Colors.white.withOpacity(0.95),
+                  color: Colors.white.withValues(alpha: 0.95),
                   elevation: 12,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(32)),
                   child: Padding(

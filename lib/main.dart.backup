@@ -30,7 +30,7 @@ class CareerApp extends StatelessWidget {
         theme: ThemeData(
           useMaterial3: true,
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.indigo, brightness: Brightness.light),
-          fontFamily: 'Roboto',
+            fontFamily: 'Roboto',
           elevatedButtonTheme: ElevatedButtonThemeData(
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.indigo,
@@ -40,12 +40,12 @@ class CareerApp extends StatelessWidget {
               textStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
             ),
           ),
-          appBarTheme: const AppBarTheme(
+          appBarTheme: AppBarTheme(
             backgroundColor: Colors.indigo,
             foregroundColor: Colors.white,
             elevation: 2,
             centerTitle: true,
-            titleTextStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 22, color: Colors.white),
+            titleTextStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 22, color: Colors.white),
           ),
           cardTheme: CardThemeData(
             color: Colors.white,
@@ -56,14 +56,13 @@ class CareerApp extends StatelessWidget {
           inputDecorationTheme: InputDecorationTheme(
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
             filled: true,
-            fillColor: Colors.grey[100],
+            fillColor: const Color(0xFFF5F5F5),
           ),
         ),
-        home: const SplashScreen(),
-        routes: {
-          '/home': (context) => const HomeScreen(),
-        },
-      ),
+      home: const SplashScreen(), // Start with splash screen
+      routes: {
+        '/home': (context) => const HomeScreen(),
+      },
     );
   }
 }
