@@ -3,57 +3,121 @@ import 'package:http/http.dart' as http;
 
 class GeminiService {
   static const String apiKey = 'AIzaSyDgMBzEsKUwSEqG6nTirkvvAafWC3spqo4';
-  static const String model = 'gemini-1.5-flash';
+  static const String model = 'gemini-2.0-flash-exp';
   static const String endpoint = 'https://generativelanguage.googleapis.com/v1beta/models/$model:generateContent?key=$apiKey';
 
   Future<String> getCareerSuggestionWithJournal(
     List<Map<String, dynamic>> answers, 
     Map<String, dynamic>? journalInsights
   ) async {
-    final prompt = _buildPromptWithJournal(answers, journalInsights);
-    final body = jsonEncode({
-      'contents': [
-        {
-          'parts': [
-            {'text': prompt}
-          ]
+    try {
+      final prompt = _buildPromptWithJournal(answers, journalInsights);
+      final body = jsonEncode({
+        'contents': [
+          {
+            'parts': [
+              {'text': prompt}
+            ]
+          }
+        ]
+      });
+      
+      print('[Gemini] Sending request to: $endpoint');
+      print('[Gemini] Prompt length: ${prompt.length} characters');
+      
+      final response = await http.post(
+        Uri.parse(endpoint),
+        headers: {'Content-Type': 'application/json'},
+        body: body,
+      );
+      
+      print('[Gemini] Response status: ${response.statusCode}');
+      print('[Gemini] Response body: ${response.body.substring(0, response.body.length > 500 ? 500 : response.body.length)}');
+      
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        final result = data['candidates']?[0]?['content']?['parts']?[0]?['text'];
+        
+        if (result == null || result.isEmpty) {
+          print('[Gemini] ERROR: Empty response from API');
+          return 'Error: Gemini returned an empty response. Please try again.';
         }
-      ]
-    });
-    final response = await http.post(
-      Uri.parse(endpoint),
-      headers: {'Content-Type': 'application/json'},
-      body: body,
-    );
-    if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
-      return data['candidates']?[0]?['content']?['parts']?[0]?['text'] ?? 'No career found.';
-    } else {
-      return 'Error: ${response.statusCode}';
+        
+        print('[Gemini] SUCCESS: Received career suggestion');
+        return result;
+      } else {
+        final errorBody = response.body;
+        print('[Gemini] ERROR: Status ${response.statusCode}, Body: $errorBody');
+        
+        // Try to parse error message
+        try {
+          final errorData = jsonDecode(errorBody);
+          final errorMessage = errorData['error']?['message'] ?? 'Unknown error';
+          return 'Gemini API Error (${response.statusCode}): $errorMessage\n\nPlease check your internet connection and try again.';
+        } catch (e) {
+          return 'Gemini API Error ${response.statusCode}: $errorBody\n\nPlease try again.';
+        }
+      }
+    } catch (e, stackTrace) {
+      print('[Gemini] EXCEPTION: $e');
+      print('[Gemini] Stack trace: $stackTrace');
+      return 'Network Error: ${e.toString()}\n\nPlease check your internet connection and try again.';
     }
   }
 
   Future<String> getCareerSuggestion(List<Map<String, dynamic>> answers) async {
-    final prompt = _buildPrompt(answers);
-    final body = jsonEncode({
-      'contents': [
-        {
-          'parts': [
-            {'text': prompt}
-          ]
+    try {
+      final prompt = _buildPrompt(answers);
+      final body = jsonEncode({
+        'contents': [
+          {
+            'parts': [
+              {'text': prompt}
+            ]
+          }
+        ]
+      });
+      
+      print('[Gemini] Sending request to: $endpoint');
+      print('[Gemini] Prompt length: ${prompt.length} characters');
+      
+      final response = await http.post(
+        Uri.parse(endpoint),
+        headers: {'Content-Type': 'application/json'},
+        body: body,
+      );
+      
+      print('[Gemini] Response status: ${response.statusCode}');
+      print('[Gemini] Response body: ${response.body.substring(0, response.body.length > 500 ? 500 : response.body.length)}');
+      
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        final result = data['candidates']?[0]?['content']?['parts']?[0]?['text'];
+        
+        if (result == null || result.isEmpty) {
+          print('[Gemini] ERROR: Empty response from API');
+          return 'Error: Gemini returned an empty response. Please try again.';
         }
-      ]
-    });
-    final response = await http.post(
-      Uri.parse(endpoint),
-      headers: {'Content-Type': 'application/json'},
-      body: body,
-    );
-    if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
-      return data['candidates']?[0]?['content']?['parts']?[0]?['text'] ?? 'No career found.';
-    } else {
-      return 'Error: ${response.statusCode}';
+        
+        print('[Gemini] SUCCESS: Received career suggestion');
+        return result;
+      } else {
+        final errorBody = response.body;
+        print('[Gemini] ERROR: Status ${response.statusCode}, Body: $errorBody');
+        
+        // Try to parse error message
+        try {
+          final errorData = jsonDecode(errorBody);
+          final errorMessage = errorData['error']?['message'] ?? 'Unknown error';
+          return 'Gemini API Error (${response.statusCode}): $errorMessage\n\nPlease check your internet connection and try again.';
+        } catch (e) {
+          return 'Gemini API Error ${response.statusCode}: $errorBody\n\nPlease try again.';
+        }
+      }
+    } catch (e, stackTrace) {
+      print('[Gemini] EXCEPTION: $e');
+      print('[Gemini] Stack trace: $stackTrace');
+      return 'Network Error: ${e.toString()}\n\nPlease check your internet connection and try again.';
     }
   }
 
