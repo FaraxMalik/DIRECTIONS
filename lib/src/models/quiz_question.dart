@@ -6,43 +6,138 @@ class QuizQuestion {
 
 final List<QuizQuestion> quizQuestions = [
   QuizQuestion(
-    question: 'Imagine you just finished a detox period. What is the first thing you want to do?',
-    options: ['Travel somewhere new', 'Start a creative project', 'Meet friends', 'Read a book'],
+    question: '🌅 You wake up on a Saturday with no plans. Your first instinct is to...',
+    options: [
+      '🌍 Explore somewhere I\'ve never been',
+      '🎨 Create something with my hands',
+      '☕ Connect with friends over coffee',
+      '📚 Dive into a fascinating book'
+    ],
   ),
   QuizQuestion(
-    question: 'Which MBTI type do you relate to most?',
-    options: ['INTJ', 'ENFP', 'ISTP', 'ESFJ'],
+    question: '🎭 At a party, you\'re most likely found...',
+    options: [
+      '🎤 Leading the conversation and meeting new people',
+      '👥 In a small group having deep discussions',
+      '🎵 Vibing with the music in the background',
+      '🏠 Planning your exit strategy'
+    ],
   ),
   QuizQuestion(
-    question: 'Which OCEAN personality trait is most dominant for you?',
-    options: ['Openness', 'Conscientiousness', 'Extraversion', 'Agreeableness'],
+    question: '💡 When faced with a problem, you...',
+    options: [
+      '🔍 Analyze every detail systematically',
+      '🤝 Gather opinions from others',
+      '⚡ Trust your gut and act quickly',
+      '📋 Make a structured plan'
+    ],
   ),
   QuizQuestion(
-    question: 'You have a free day. What do you do?',
-    options: ['Explore outdoors', 'Learn something new', 'Help someone', 'Relax at home'],
+    question: '🎯 Your ideal weekend project would be...',
+    options: [
+      '💻 Building an app or website',
+      '🎪 Organizing an event',
+      '🖼️ Painting or crafting something',
+      '📖 Learning a new language'
+    ],
   ),
   QuizQuestion(
-    question: 'Which activity excites you most?',
-    options: ['Solving puzzles', 'Leading a team', 'Creating art', 'Helping others'],
+    question: '🌟 What gets you out of bed in the morning?',
+    options: [
+      '🏆 The thrill of achieving goals',
+      '❤️ Making a difference in people\'s lives',
+      '✨ Expressing myself creatively',
+      '💪 Building something lasting'
+    ],
   ),
   QuizQuestion(
-    question: 'If you could master any skill instantly, what would it be?',
-    options: ['Coding', 'Public speaking', 'Painting', 'Negotiation'],
+    question: '🎬 If your life was a movie genre, it would be...',
+    options: [
+      '🚀 Action/Adventure',
+      '🎭 Drama/Romance',
+      '🔬 Sci-Fi/Thriller',
+      '🎨 Indie/Artistic'
+    ],
   ),
   QuizQuestion(
-    question: 'What motivates you most?',
-    options: ['Achievement', 'Connection', 'Creativity', 'Security'],
+    question: '🛠️ You\'re given a broken device. Your reaction?',
+    options: [
+      '🔧 Take it apart to understand how it works',
+      '📞 Call someone who knows how to fix it',
+      '♻️ Get creative and repurpose it',
+      '📱 Research and follow a guide'
+    ],
   ),
   QuizQuestion(
-    question: 'How do you handle stress?',
-    options: ['Exercise', 'Talk to friends', 'Meditate', 'Work harder'],
+    question: '🌈 Your dream work environment has...',
+    options: [
+      '⚡ High energy and constant challenges',
+      '🤗 Supportive team and great culture',
+      '🏔️ Freedom and flexibility',
+      '📊 Clear structure and expectations'
+    ],
   ),
   QuizQuestion(
-    question: 'Which environment do you thrive in?',
-    options: ['Fast-paced', 'Collaborative', 'Independent', 'Structured'],
+    question: '🎓 If you could learn anything instantly, it would be...',
+    options: [
+      '👨‍💻 Advanced programming',
+      '🎤 Persuasion and public speaking',
+      '🎨 Masterful artistic skills',
+      '💼 Strategic negotiation'
+    ],
   ),
   QuizQuestion(
-    question: 'If you could do any job for a day, what would it be?',
-    options: ['Entrepreneur', 'Scientist', 'Artist', 'Teacher'],
+    question: '🌊 When stress hits, you...',
+    options: [
+      '🏃 Get moving and exercise',
+      '👫 Reach out to friends',
+      '🧘 Take time alone to reflect',
+      '💪 Push through and work harder'
+    ],
+  ),
+  QuizQuestion(
+    question: '🎯 Success to you means...',
+    options: [
+      '💰 Financial freedom and stability',
+      '🌟 Recognition and impact',
+      '😊 Happiness and fulfillment',
+      '🚀 Innovation and breakthroughs'
+    ],
+  ),
+  QuizQuestion(
+    question: '📱 You discover a new tech gadget. You...',
+    options: [
+      '🤓 Read every spec and review',
+      '💭 Wonder how it could help others',
+      '🎨 Imagine creative uses for it',
+      '🛒 Wait to see if it\'s practical'
+    ],
+  ),
+  QuizQuestion(
+    question: '🎪 If you were starting a business tomorrow, it would be...',
+    options: [
+      '💻 A tech startup',
+      '🏢 A consulting firm',
+      '🎨 A creative studio',
+      '🏫 An educational platform'
+    ],
+  ),
+  QuizQuestion(
+    question: '🌍 Your ideal vacation involves...',
+    options: [
+      '🏔️ Adventure and adrenaline',
+      '🏛️ Culture and history',
+      '🏝️ Relaxation and tranquility',
+      '🎉 Social activities and nightlife'
+    ],
+  ),
+  QuizQuestion(
+    question: '✨ People usually describe you as...',
+    options: [
+      '🧠 Analytical and logical',
+      '💖 Empathetic and caring',
+      '🎨 Creative and original',
+      '⚡ Energetic and driven'
+    ],
   ),
 ];

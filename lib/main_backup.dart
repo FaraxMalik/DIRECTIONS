@@ -9,15 +9,7 @@ import 'src/services/journal_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
-  try {
-    await Firebase.initializeApp();
-    print("✅ Firebase initialized successfully");
-  } catch (e) {
-    print("⚠️ Firebase initialization failed: $e");
-    // Continue without Firebase for offline functionality
-  }
-  
+  await Firebase.initializeApp();
   runApp(const CareerApp());
 }
 

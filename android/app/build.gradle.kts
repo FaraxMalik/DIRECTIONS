@@ -7,14 +7,15 @@ plugins {
 
 android {
     namespace = "com.example.career_app"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.example.directions"
+        applicationId = "com.example.career_app"
         minSdk = 23
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
+        multiDexEnabled = true
     }
 
     compileOptions {
@@ -36,5 +37,6 @@ android {
 dependencies {
     implementation(platform("com.google.firebase:firebase-bom:34.1.0"))
     implementation("com.google.firebase:firebase-analytics")
+    implementation("androidx.multidex:multidex:2.0.1")
     // Add other Firebase dependencies as needed
 }

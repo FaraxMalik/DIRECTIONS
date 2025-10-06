@@ -90,34 +90,10 @@ class JournalService extends ChangeNotifier {
 
   /// Save or update a journal entry
   Future<void> saveEntry(JournalEntry entry) async {
-    final user = _auth.currentUser;
-    if (user == null) {
-      Logger.warning('JournalService.saveEntry: No user logged in');
-      return;
-    }
-    
     Logger.info('JournalService.saveEntry: Saving entry "${entry.title}"');
     
     try {
-      // Check Firebase setup
-      if (!FirebaseSetupService.isFullyConfigured) {
-        Logger.warning('JournalService.saveEntry: Firebase not configured, attempting setup...');
-        final setupSuccess = await FirebaseSetupService.reinitialize();
-        if (!setupSuccess) {
-          throw Exception('Firebase setup failed: ${FirebaseSetupService.lastError}');
-        }
-      }
-      
-      // Save to Firestore
-      await _firestore
-          .collection('users')
-          .doc(user.uid)
-          .collection('journal_entries')
-          .doc(entry.id)
-          .set(entry.toMap(), SetOptions(merge: true))
-          .timeout(const Duration(seconds: 20));
-      
-      // Update local state
+      // Always save locally first
       final existingIndex = _entries.indexWhere((e) => e.id == entry.id);
       if (existingIndex != -1) {
         _entries[existingIndex] = entry;
@@ -131,27 +107,33 @@ class JournalService extends ChangeNotifier {
       await _saveToCache();
       _lastError = null;
       
-      Logger.info('JournalService.saveEntry: Successfully saved entry');
+      Logger.info('JournalService.saveEntry: Entry saved locally');
+      
+      // Try to save to Firebase if user is logged in
+      final user = _auth.currentUser;
+      if (user != null && FirebaseSetupService.isFullyConfigured) {
+        try {
+          await _firestore
+              .collection('users')
+              .doc(user.uid)
+              .collection('journal_entries')
+              .doc(entry.id)
+              .set(entry.toMap(), SetOptions(merge: true))
+              .timeout(const Duration(seconds: 20));
+          
+          Logger.info('JournalService.saveEntry: Entry synced to cloud');
+        } catch (e) {
+          Logger.warning('JournalService.saveEntry: Cloud sync failed, but entry is saved locally', e);
+          // Continue - local save succeeded
+        }
+      } else {
+        Logger.info('JournalService.saveEntry: Working offline - entry saved locally only');
+      }
       
     } catch (e) {
       Logger.error('JournalService.saveEntry: Error saving entry', e);
-      
-      // Save locally even if cloud save failed
-      final existingIndex = _entries.indexWhere((e) => e.id == entry.id);
-      if (existingIndex != -1) {
-        _entries[existingIndex] = entry;
-      } else {
-        _entries.insert(0, entry);
-      }
-      
-      _entries.sort((a, b) => b.createdAt.compareTo(a.createdAt));
-      await _saveToCache();
-      
-      if (e.toString().contains('unavailable') || e.toString().contains('offline')) {
-        _lastError = 'Entry saved locally - will sync when online';
-      } else {
-        _lastError = 'Entry saved locally only';
-      }
+      _lastError = 'Failed to save entry';
+      rethrow;
     }
     
     notifyListeners();

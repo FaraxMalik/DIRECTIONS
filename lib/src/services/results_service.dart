@@ -44,14 +44,17 @@ class ResultsService extends ChangeNotifier {
       if (cachedResultsJson != null && cachedResultsJson.isNotEmpty) {
         try {
           _results = cachedResultsJson.map((jsonStr) {
-            // Simple JSON parsing for cached results
-            // This is a simplified version - in production, you'd use proper JSON serialization
+            // Parse the cached result string back into a map
+            final parts = jsonStr.split('|||');
+            final description = parts.length > 0 ? parts[0] : '';
+            final careerTitle = parts.length > 1 ? parts[1] : 'Career';
+            final timestamp = parts.length > 2 ? int.tryParse(parts[2]) ?? DateTime.now().millisecondsSinceEpoch : DateTime.now().millisecondsSinceEpoch;
+            
             return QuizResult(
-              recommendedCareers: ['Cached Career'], // Placeholder
-              scores: {'general': 5.0}, // Placeholder
-              createdAt: DateTime.now().subtract(const Duration(days: 1)),
-              personalityType: 'CACHED',
-              description: 'Cached result',
+              recommendedCareers: [careerTitle],
+              scores: {'general': 5.0},
+              createdAt: DateTime.fromMillisecondsSinceEpoch(timestamp),
+              description: description,
             );
           }).toList();
           
@@ -110,54 +113,41 @@ class ResultsService extends ChangeNotifier {
   }
 
   Future<void> addResult(QuizResult result) async {
-    final user = _auth.currentUser;
-    if (user == null) {
-      Logger.warning('ResultsService.addResult: No user logged in');
-      return;
-    }
-    
     Logger.info('ResultsService.addResult: Adding new result');
     
     try {
-      // Check Firebase setup before saving
-      if (!FirebaseSetupService.isFullyConfigured) {
-        Logger.warning('ResultsService.addResult: Firebase not configured, attempting setup...');
-        final setupSuccess = await FirebaseSetupService.reinitialize();
-        if (!setupSuccess) {
-          throw Exception('Firebase setup failed: ${FirebaseSetupService.lastError}');
-        }
-      }
-      
-      // Save to Firestore
-      await _firestore
-          .collection('users')
-          .doc(user.uid)
-          .collection('results')
-          .add(result.toMap())
-          .timeout(const Duration(seconds: 20));
-      
-      // Update local state
+      // Always save locally first
       _results.insert(0, result);
       _latest = result;
       await _cache();
       _lastError = null;
       
-      Logger.info('ResultsService.addResult: Successfully saved result');
+      Logger.info('ResultsService.addResult: Result saved locally');
+      
+      // Try to save to Firebase if user is logged in
+      final user = _auth.currentUser;
+      if (user != null && FirebaseSetupService.isFullyConfigured) {
+        try {
+          await _firestore
+              .collection('users')
+              .doc(user.uid)
+              .collection('results')
+              .add(result.toMap())
+              .timeout(const Duration(seconds: 20));
+          
+          Logger.info('ResultsService.addResult: Result synced to cloud');
+        } catch (e) {
+          Logger.warning('ResultsService.addResult: Cloud sync failed, but result is saved locally', e);
+          // Continue - local save succeeded
+        }
+      } else {
+        Logger.info('ResultsService.addResult: Working offline - result saved locally only');
+      }
       
     } catch (e) {
       Logger.error('ResultsService.addResult: Error saving result', e);
-      
-      // Add locally even if cloud save failed
-      _results.insert(0, result);
-      _latest = result;
-      await _cache();
-      
-      // Set user-friendly error message
-      if (e.toString().contains('unavailable') || e.toString().contains('offline')) {
-        _lastError = 'Result saved locally - will sync when online';
-      } else {
-        _lastError = 'Result saved locally only';
-      }
+      _lastError = 'Failed to save result';
+      rethrow;
     }
     
     notifyListeners();
@@ -167,8 +157,11 @@ class ResultsService extends ChangeNotifier {
     try {
       final prefs = await SharedPreferences.getInstance();
       final resultsJson = _results.take(10).map((result) { // Cache last 10 results
-        final map = result.toMap();
-        return map.entries.map((e) => '${e.key}:${e.value}').join('|');
+        // Create a simple string format: description|||careerTitle|||timestamp
+        final description = result.description ?? '';
+        final careerTitle = result.recommendedCareers.isNotEmpty ? result.recommendedCareers.first : 'Career';
+        final timestamp = result.createdAt.millisecondsSinceEpoch.toString();
+        return '$description|||$careerTitle|||$timestamp';
       }).toList();
       
       await prefs.setStringList('cached_results', resultsJson);

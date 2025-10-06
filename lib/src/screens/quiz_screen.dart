@@ -1,8 +1,12 @@
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'dart:ui';
 import '../models/quiz_question.dart';
+import '../models/quiz_result.dart';
 import '../services/gemini_service.dart';
+import '../services/results_service.dart';
+import '../services/journal_service.dart';
 
 class QuizResultStore {
   static String latestResult = '';
@@ -39,40 +43,137 @@ class _QuizScreenState extends State<QuizScreen> {
       'question': quizQuestions[i].question,
       'answer': _custom[i]?.isNotEmpty == true ? _custom[i] : _selected[i] ?? '',
     });
-    final gemini = GeminiService();
-    final response = await gemini.getCareerSuggestion(answers);
-    setState(() {
-      _result = response;
-      QuizResultStore.latestResult = response;
-      _loading = false;
-    });
+    
+    try {
+      // Load journal insights for better career recommendations
+      final journalService = Provider.of<JournalService>(context, listen: false);
+      await journalService.loadEntries();
+      final journalInsights = journalService.getJournalInsights();
+      
+      final gemini = GeminiService();
+      // Use journal data if available, otherwise just quiz answers
+      final response = journalInsights.isNotEmpty
+          ? await gemini.getCareerSuggestionWithJournal(answers, journalInsights)
+          : await gemini.getCareerSuggestion(answers);
+      
+      // Parse the response to create a QuizResult
+      final lines = response.split('\n');
+      String careerTitle = 'Career Suggestion';
+      String description = response;
+      
+      // Try to extract title and description
+      for (var line in lines) {
+        if (line.toLowerCase().contains('title:')) {
+          careerTitle = line.replaceAll(RegExp(r'title:', caseSensitive: false), '').trim();
+        }
+      }
+      
+      // Create QuizResult object
+      final quizResult = QuizResult(
+        recommendedCareers: [careerTitle],
+        scores: {'general': 5.0},
+        createdAt: DateTime.now(),
+        description: response,
+      );
+      
+      // Save the result using ResultsService
+      final resultsService = Provider.of<ResultsService>(context, listen: false);
+      await resultsService.addResult(quizResult);
+      
+      setState(() {
+        _result = response;
+        QuizResultStore.latestResult = response;
+        _loading = false;
+      });
+    } catch (e) {
+      print('Quiz submission error: $e');
+      setState(() {
+        _result = 'Error generating career suggestion. Please try again.';
+        _loading = false;
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Career Quiz'),
+        backgroundColor: Colors.indigo,
+      ),
+      body: _buildBody(context),
+    );
+  }
+
+  Widget _buildBody(BuildContext context) {
     if (_loading) {
-      return Center(child: CircularProgressIndicator());
+      return Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Colors.indigo.shade400, Colors.blueAccent.shade200],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CircularProgressIndicator(color: Colors.white),
+              SizedBox(height: 24),
+              Text(
+                'Analyzing your answers...',
+                style: TextStyle(color: Colors.white, fontSize: 18),
+              ),
+            ],
+          ),
+        ),
+      );
     }
     if (_result != null) {
       final lines = _result!.split('\n');
       String title = lines.isNotEmpty ? lines[0] : 'Recommended Career';
       String description = lines.length > 1 ? lines.sublist(1).join(' ') : '';
-      return Padding(
-        padding: const EdgeInsets.all(24.0),
-        child: Card(
-          elevation: 6,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+      return Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Colors.indigo.shade400, Colors.blueAccent.shade200],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
+        child: Center(
           child: Padding(
-            padding: const EdgeInsets.all(32.0),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(Icons.work, size: 64, color: Colors.indigo),
-                SizedBox(height: 24),
-                Text(title, style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
-                SizedBox(height: 16),
-                Text(description, style: TextStyle(fontSize: 18)),
-              ],
+            padding: const EdgeInsets.all(24.0),
+            child: Card(
+              elevation: 6,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+              child: Padding(
+                padding: const EdgeInsets.all(32.0),
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.work, size: 64, color: Colors.indigo),
+                      SizedBox(height: 24),
+                      Text(title, style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+                      SizedBox(height: 16),
+                      Text(description, style: TextStyle(fontSize: 18)),
+                      SizedBox(height: 32),
+                      ElevatedButton.icon(
+                        onPressed: () => Navigator.of(context).pop(),
+                        icon: Icon(Icons.home),
+                        label: Text('Back to Home'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.indigo,
+                          foregroundColor: Colors.white,
+                          padding: EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             ),
           ),
         ),

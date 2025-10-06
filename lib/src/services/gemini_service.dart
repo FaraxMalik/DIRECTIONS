@@ -61,41 +61,59 @@ class GeminiService {
     final buffer = StringBuffer();
     buffer.writeln(
       'You are an expert Career Counselor with years of experience helping students choose the right, realistic career paths and succeed. '
-      'You are given questionnaire answers AND journal insights from the user. Your task: suggest ONE best-suited career from today\'s job market and briefly explain why it fits.'
+      'You are given questionnaire answers AND personal journal entries from the user. '
+      'The journal entries contain the user\'s RANDOM THOUGHTS - these are extremely valuable for understanding HOW THE USER THINKS and PROCESSES information. '
+      'Your task: suggest ONE best-suited career from today\'s job market and explain why it fits based on BOTH quiz answers AND journal analysis.'
     );
     buffer.writeln();
     
     if (journalInsights != null && journalInsights.isNotEmpty) {
-      buffer.writeln('JOURNAL INSIGHTS:');
+      buffer.writeln('═══════════════════════════════════════════════════════════');
+      buffer.writeln('📊 JOURNAL STATISTICS:');
+      buffer.writeln('═══════════════════════════════════════════════════════════');
       buffer.writeln('Total entries: ${journalInsights['totalEntries']}');
       buffer.writeln('Writing frequency: ${journalInsights['writingFrequency']?.toStringAsFixed(2)} entries/day');
       buffer.writeln('Dominant mood: ${journalInsights['dominantMood']}');
-      buffer.writeln('Average words per entry: ${journalInsights['averageWordsPerEntry']}');
-      if (journalInsights['commonTags'] != null) {
+      buffer.writeln('Average words per entry: ${journalInsights['averageWordsPerEntry']?.toStringAsFixed(0)}');
+      if (journalInsights['commonTags'] != null && (journalInsights['commonTags'] as List).isNotEmpty) {
         buffer.writeln('Common themes: ${(journalInsights['commonTags'] as List).join(', ')}');
       }
       buffer.writeln();
-      buffer.writeln('JOURNAL EXCERPT (analyze thinking patterns, communication style, interests):');
+      buffer.writeln('═══════════════════════════════════════════════════════════');
+      buffer.writeln('💭 USER\'S JOURNAL ENTRIES (Random Thoughts & Observations):');
+      buffer.writeln('═══════════════════════════════════════════════════════════');
+      buffer.writeln('IMPORTANT: These are the user\'s PERSONAL THOUGHTS. Analyze them carefully to understand:');
+      buffer.writeln('- HOW they think and process information');
+      buffer.writeln('- WHAT topics genuinely interest them');
+      buffer.writeln('- Their communication style and depth of thinking');
+      buffer.writeln('- Their natural inclinations, passions, and problem-solving approach');
+      buffer.writeln('- Patterns in their concerns, aspirations, and decision-making');
+      buffer.writeln();
       final allText = journalInsights['allText'] as String? ?? '';
-      // Limit journal text to 1000 characters to avoid token limits
-      final truncatedText = allText.length > 1000 ? '${allText.substring(0, 1000)}...' : allText;
+      // Limit to 3000 characters for more context
+      final truncatedText = allText.length > 3000 ? '${allText.substring(0, 3000)}...' : allText;
       buffer.writeln(truncatedText);
+      buffer.writeln();
+      buffer.writeln('═══════════════════════════════════════════════════════════');
       buffer.writeln();
     }
     
-    buffer.writeln('Output requirements:');
-    buffer.writeln('- Use BOTH quiz answers AND journal insights to make recommendation');
-    buffer.writeln('- Journal shows personality, thinking patterns, communication style, interests, and emotional intelligence');
-    buffer.writeln('- Be realistic and specific (e.g., Data Analyst, UX Designer, Fashion Designer, Lawyer, Entrepreneur, Mechanical Engineer; not generic).');
-    buffer.writeln('- Align the rationale directly to BOTH the quiz answers AND journal patterns.');
-    buffer.writeln('- Keep it concise and professional; no fluff or disclaimers.');
-    buffer.writeln('- Limit explanation to 3–5 sentences.');
+    buffer.writeln('📝 OUTPUT REQUIREMENTS:');
+    buffer.writeln('- CRITICALLY IMPORTANT: Give HEAVY WEIGHT to the journal entries - they reveal the user\'s true thinking patterns');
+    buffer.writeln('- Use BOTH quiz answers AND journal content to make your recommendation');
+    buffer.writeln('- The journal shows authentic personality, thinking patterns, interests, and decision-making style');
+    buffer.writeln('- Be realistic and specific (e.g., Data Analyst, UX Designer, Fashion Designer, Lawyer, Entrepreneur, Mechanical Engineer; not generic)');
+    buffer.writeln('- Align the rationale directly to BOTH the quiz answers AND observable patterns from the journal');
+    buffer.writeln('- Keep it concise and professional; no fluff or disclaimers');
+    buffer.writeln('- Limit explanation to 3–5 sentences');
     buffer.writeln();
-    buffer.writeln('Output format:');
+    buffer.writeln('📋 OUTPUT FORMAT:');
     buffer.writeln('Title: <career>');
-    buffer.writeln('Reason: <3–5 sentences explaining the fit based on quiz AND journal>');
+    buffer.writeln('Reason: <3–5 sentences explaining the fit based on quiz AND journal thinking patterns>');
     buffer.writeln();
-    buffer.writeln('QUIZ ANSWERS:');
+    buffer.writeln('═══════════════════════════════════════════════════════════');
+    buffer.writeln('📊 QUIZ ANSWERS:');
+    buffer.writeln('═══════════════════════════════════════════════════════════');
     
     for (int i = 0; i < answers.length; i++) {
       final answer = answers[i];

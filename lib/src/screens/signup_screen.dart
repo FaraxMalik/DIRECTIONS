@@ -4,7 +4,6 @@ import 'package:provider/provider.dart';
 import '../services/auth_service.dart';
 import '../services/profile_service.dart';
 import '../models/user_profile.dart';
-import 'home_screen.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -29,7 +28,7 @@ class _SignupScreenState extends State<SignupScreen> {
       _error = null;
     });
     try {
-      // Save user info locally for now (can be extended to Firebase later)
+      // Create account
       final user = await _auth.signUp(emailController.text.trim(), passwordController.text.trim());
       if (user != null) {
         // Save profile information through ProfileService
@@ -42,8 +41,21 @@ class _SignupScreenState extends State<SignupScreen> {
           gender: gender,
         );
         await profileService.saveProfile(profile);
+        
+        // Sign out after signup so user can login
+        await _auth.signOut();
+        
         if (mounted) {
-          Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => HomeScreen()));
+          // Show success message
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Account created successfully! Please login.'),
+              backgroundColor: Colors.green,
+              duration: Duration(seconds: 2),
+            ),
+          );
+          // Navigate back to login screen
+          Navigator.pop(context);
         }
       } else {
         setState(() => _error = 'Could not sign up');

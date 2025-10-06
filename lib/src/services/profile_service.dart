@@ -44,6 +44,8 @@ class ProfileService extends ChangeNotifier {
           uid: user.uid,
           email: cachedEmail,
           displayName: prefs.getString('profile_displayName'),
+          age: prefs.getString('profile_age'),
+          gender: prefs.getString('profile_gender'),
           preferences: null,
         );
         Logger.debug('ProfileService.load: Loaded cached profile for $cachedEmail');
@@ -112,51 +114,39 @@ class ProfileService extends ChangeNotifier {
   }
 
   Future<void> save(UserProfile profile) async {
-    final user = _auth.currentUser;
-    if (user == null) {
-      Logger.warning('ProfileService.save: No user logged in');
-      return;
-    }
-    
-    Logger.info('ProfileService.save: Saving profile for user ${user.uid}');
+    Logger.info('ProfileService.save: Saving profile');
     
     try {
-      // Check Firebase setup before saving
-      if (!FirebaseSetupService.isFullyConfigured) {
-        Logger.warning('ProfileService.save: Firebase not configured, attempting setup...');
-        final setupSuccess = await FirebaseSetupService.reinitialize();
-        if (!setupSuccess) {
-          throw Exception('Firebase setup failed: ${FirebaseSetupService.lastError}');
-        }
-      }
-      
-      // Save to Firestore
-      await _firestore
-          .collection('users')
-          .doc(user.uid)
-          .set(profile.toMap(), SetOptions(merge: true))
-          .timeout(const Duration(seconds: 20));
-      
-      // Update local state and cache
+      // Always save locally first
       _profile = profile;
       await _cache(profile);
       _lastError = null;
       
-      Logger.info('ProfileService.save: Successfully saved profile');
+      Logger.info('ProfileService.save: Profile saved locally');
+      
+      // Try to save to Firebase if user is logged in
+      final user = _auth.currentUser;
+      if (user != null && FirebaseSetupService.isFullyConfigured) {
+        try {
+          await _firestore
+              .collection('users')
+              .doc(user.uid)
+              .set(profile.toMap(), SetOptions(merge: true))
+              .timeout(const Duration(seconds: 20));
+          
+          Logger.info('ProfileService.save: Profile synced to cloud');
+        } catch (e) {
+          Logger.warning('ProfileService.save: Cloud sync failed, but profile is saved locally', e);
+          // Continue - local save succeeded
+        }
+      } else {
+        Logger.info('ProfileService.save: Working offline - profile saved locally only');
+      }
       
     } catch (e) {
       Logger.error('ProfileService.save: Error saving profile', e);
-      
-      // Cache locally even if cloud save failed
-      _profile = profile;
-      await _cache(profile);
-      
-      // Set user-friendly error message
-      if (e.toString().contains('unavailable') || e.toString().contains('offline')) {
-        _lastError = 'Saved locally - will sync when online';
-      } else {
-        _lastError = 'Profile saved locally only';
-      }
+      _lastError = 'Failed to save profile';
+      rethrow;
     }
     
     notifyListeners();
@@ -166,9 +156,25 @@ class ProfileService extends ChangeNotifier {
     try {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('profile_email', profile.email);
+      
       if (profile.displayName != null) {
         await prefs.setString('profile_displayName', profile.displayName!);
+      } else {
+        await prefs.remove('profile_displayName');
       }
+      
+      if (profile.age != null) {
+        await prefs.setString('profile_age', profile.age!);
+      } else {
+        await prefs.remove('profile_age');
+      }
+      
+      if (profile.gender != null) {
+        await prefs.setString('profile_gender', profile.gender!);
+      } else {
+        await prefs.remove('profile_gender');
+      }
+      
       Logger.debug('ProfileService._cache: Cached profile data');
     } catch (e) {
       Logger.error('ProfileService._cache: Error caching profile', e);
@@ -176,22 +182,37 @@ class ProfileService extends ChangeNotifier {
   }
 
   Future<void> saveProfile(UserProfile profile) async {
-    final user = _auth.currentUser;
-    if (user == null) return;
-
+    Logger.info('ProfileService.saveProfile: Saving profile');
+    
     try {
       _loading = true;
       notifyListeners();
-
-      // Save to Firestore
-      await _firestore.collection('users').doc(user.uid).set(profile.toMap());
       
-      // Update local state
+      // Always save locally first
       _profile = profile;
-      _lastError = null;
-
-      // Cache locally
       await _cache(profile);
+      _lastError = null;
+      
+      Logger.info('ProfileService.saveProfile: Profile saved locally');
+      
+      // Try to save to Firebase if user is logged in
+      final user = _auth.currentUser;
+      if (user != null && FirebaseSetupService.isFullyConfigured) {
+        try {
+          await _firestore
+              .collection('users')
+              .doc(user.uid)
+              .set(profile.toMap(), SetOptions(merge: true))
+              .timeout(const Duration(seconds: 20));
+          
+          Logger.info('ProfileService.saveProfile: Profile synced to cloud');
+        } catch (e) {
+          Logger.warning('ProfileService.saveProfile: Cloud sync failed, but profile is saved locally', e);
+          // Continue - local save succeeded
+        }
+      } else {
+        Logger.info('ProfileService.saveProfile: Working offline - profile saved locally only');
+      }
 
       notifyListeners();
     } catch (e) {

@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../services/profile_service.dart';
+import '../models/user_profile.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -29,28 +30,46 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> _save() async {
-    final user = FirebaseAuth.instance.currentUser;
-    if (user == null) return;
-    setState(() => _saving = true);
-    final firestore = FirebaseFirestore.instance;
-
-    Future<void> attempt() async {
-      await firestore.collection('users').doc(user.uid).set({
-        'email': user.email ?? '',
-        'displayName': _nameCtrl.text.trim().isEmpty ? null : _nameCtrl.text.trim(),
-        'age': _ageCtrl.text.trim(),
-        'gender': _genderCtrl.text.trim(),
-      }, SetOptions(merge: true));
+    if (_nameCtrl.text.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please enter your name')),
+      );
+      return;
     }
-
+    
+    setState(() => _saving = true);
+    
     try {
-      await attempt();
+      final profileService = Provider.of<ProfileService>(context, listen: false);
+      
+      // Create UserProfile with form data
+      final profile = UserProfile(
+        uid: FirebaseAuth.instance.currentUser?.uid ?? 'offline_user',
+        email: FirebaseAuth.instance.currentUser?.email ?? 'offline@example.com',
+        displayName: _nameCtrl.text.trim(),
+        age: _ageCtrl.text.trim().isEmpty ? null : _ageCtrl.text.trim(),
+        gender: _genderCtrl.text.trim().isEmpty ? null : _genderCtrl.text.trim(),
+      );
+      
+      await profileService.saveProfile(profile);
+      
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Profile saved successfully!'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+      
     } catch (e) {
-      if (e.toString().contains('unavailable') || e.toString().contains('network') || e.toString().contains('deadline')) {
-        await Future.delayed(const Duration(milliseconds: 800));
-        await attempt();
-      } else {
-        rethrow;
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to save profile: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
       }
     } finally {
       if (mounted) setState(() => _saving = false);
@@ -60,83 +79,89 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     final user = FirebaseAuth.instance.currentUser;
-    return Container(
-      color: Color(0xFFB3E5FC),
-      child: Center(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(24.0),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(32),
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-                child: Card(
-                  color: Colors.white.withValues(alpha: 0.95),
-                  elevation: 12,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(32)),
-                  child: Padding(
-                    padding: const EdgeInsets.all(32.0),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        CircleAvatar(
-                          radius: 40,
-                          backgroundColor: Colors.blue,
-                          child: Icon(Icons.person, size: 48, color: Colors.white),
-                        ),
-                        SizedBox(height: 24),
-                        Text('Profile', style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold, color: Colors.blue)),
-                        SizedBox(height: 24),
-                        Divider(thickness: 1.5),
-                        SizedBox(height: 16),
-                        StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-                          stream: user == null
-                              ? const Stream.empty()
-                              : FirebaseFirestore.instance.collection('users').doc(user.uid).snapshots(),
-                          builder: (context, snap) {
-                            final data = snap.data?.data();
-                            final email = data?['email'] ?? user?.email ?? '';
-                            final name = data?['displayName'] ?? _nameCtrl.text;
-                            final age = data?['age'] ?? _ageCtrl.text;
-                            final gender = data?['gender'] ?? _genderCtrl.text;
-                            return Column(
-                              children: [
-                                _profileRow('Email', email),
-                                TextField(
-                                  controller: _nameCtrl,
-                                  decoration: InputDecoration(labelText: 'Name'),
-                                  textInputAction: TextInputAction.next,
-                                ),
-                                SizedBox(height: 12),
-                                TextField(
-                                  controller: _ageCtrl,
-                                  decoration: InputDecoration(labelText: 'Age'),
-                                  keyboardType: TextInputType.number,
-                                  textInputAction: TextInputAction.next,
-                                ),
-                                SizedBox(height: 12),
-                                TextField(
-                                  controller: _genderCtrl,
-                                  decoration: InputDecoration(labelText: 'Gender'),
-                                  textInputAction: TextInputAction.done,
-                                ),
-                                SizedBox(height: 20),
-                                SizedBox(
-                                  width: double.infinity,
-                                  child: ElevatedButton(
-                                    onPressed: _saving ? null : _save,
-                                    child: Text(_saving ? 'Saving...' : 'Save'),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Profile'),
+        backgroundColor: Colors.indigo,
+      ),
+      body: Container(
+        color: Color(0xFFB3E5FC),
+        child: Center(
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(32),
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+                  child: Card(
+                    color: Colors.white.withValues(alpha: 0.95),
+                    elevation: 12,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(32)),
+                    child: Padding(
+                      padding: const EdgeInsets.all(32.0),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          CircleAvatar(
+                            radius: 40,
+                            backgroundColor: Colors.blue,
+                            child: Icon(Icons.person, size: 48, color: Colors.white),
+                          ),
+                          SizedBox(height: 24),
+                          Text('Profile', style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold, color: Colors.blue)),
+                          SizedBox(height: 24),
+                          Divider(thickness: 1.5),
+                          SizedBox(height: 16),
+                          StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+                            stream: user == null
+                                ? const Stream.empty()
+                                : FirebaseFirestore.instance.collection('users').doc(user.uid).snapshots(),
+                            builder: (context, snap) {
+                              final data = snap.data?.data();
+                              final email = data?['email'] ?? user?.email ?? '';
+                              final name = data?['displayName'] ?? _nameCtrl.text;
+                              final age = data?['age'] ?? _ageCtrl.text;
+                              final gender = data?['gender'] ?? _genderCtrl.text;
+                              return Column(
+                                children: [
+                                  _profileRow('Email', email),
+                                  TextField(
+                                    controller: _nameCtrl,
+                                    decoration: InputDecoration(labelText: 'Name'),
+                                    textInputAction: TextInputAction.next,
                                   ),
-                                ),
-                                SizedBox(height: 16),
-                                _profileRow('Live Name', name),
-                                _profileRow('Live Age', age),
-                                _profileRow('Live Gender', gender),
-                              ],
-                            );
-                          },
-                        ),
-                      ],
+                                  SizedBox(height: 12),
+                                  TextField(
+                                    controller: _ageCtrl,
+                                    decoration: InputDecoration(labelText: 'Age'),
+                                    keyboardType: TextInputType.number,
+                                    textInputAction: TextInputAction.next,
+                                  ),
+                                  SizedBox(height: 12),
+                                  TextField(
+                                    controller: _genderCtrl,
+                                    decoration: InputDecoration(labelText: 'Gender'),
+                                    textInputAction: TextInputAction.done,
+                                  ),
+                                  SizedBox(height: 20),
+                                  SizedBox(
+                                    width: double.infinity,
+                                    child: ElevatedButton(
+                                      onPressed: _saving ? null : _save,
+                                      child: Text(_saving ? 'Saving...' : 'Save'),
+                                    ),
+                                  ),
+                                  SizedBox(height: 16),
+                                  _profileRow('Live Name', name),
+                                  _profileRow('Live Age', age),
+                                  _profileRow('Live Gender', gender),
+                                ],
+                              );
+                            },
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),

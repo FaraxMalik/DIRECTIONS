@@ -18,10 +18,13 @@ class Logger {
     }
   }
   
-  /// Log warning message
-  static void warning(String message) {
+  /// Log warning message with optional error object
+  static void warning(String message, [Object? error]) {
     if (kDebugMode) {
       print('$_tag WARNING: $message');
+      if (error != null) {
+        print('$_tag WARNING Details: $error');
+      }
     }
   }
   
