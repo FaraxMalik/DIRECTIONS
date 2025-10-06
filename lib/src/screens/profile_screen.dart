@@ -1,4 +1,3 @@
-
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -9,6 +8,7 @@ import '../models/user_profile.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
+
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
 }
@@ -36,13 +36,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
       );
       return;
     }
-    
+
     setState(() => _saving = true);
-    
+
     try {
       final profileService = Provider.of<ProfileService>(context, listen: false);
-      
-      // Create UserProfile with form data
+
       final profile = UserProfile(
         uid: FirebaseAuth.instance.currentUser?.uid ?? 'offline_user',
         email: FirebaseAuth.instance.currentUser?.email ?? 'offline@example.com',
@@ -50,9 +49,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
         age: _ageCtrl.text.trim().isEmpty ? null : _ageCtrl.text.trim(),
         gender: _genderCtrl.text.trim().isEmpty ? null : _genderCtrl.text.trim(),
       );
-      
+
       await profileService.saveProfile(profile);
-      
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -61,7 +60,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
         );
       }
-      
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -79,90 +77,154 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     final user = FirebaseAuth.instance.currentUser;
+
     return Scaffold(
       appBar: AppBar(
-        title: Text('Profile'),
-        backgroundColor: Colors.indigo,
+        title: const Text('Your Profile'),
       ),
       body: Container(
-        color: Color(0xFFB3E5FC),
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Color(0xFFFFFEF0), Color(0xFFF5E6D3)],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+        ),
         child: Center(
           child: SingleChildScrollView(
             child: Padding(
               padding: const EdgeInsets.all(24.0),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(32),
-                child: BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-                  child: Card(
-                    color: Colors.white.withValues(alpha: 0.95),
-                    elevation: 12,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(32)),
-                    child: Padding(
-                      padding: const EdgeInsets.all(32.0),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          CircleAvatar(
-                            radius: 40,
-                            backgroundColor: Colors.blue,
-                            child: Icon(Icons.person, size: 48, color: Colors.white),
+              child: Card(
+                color: Colors.white,
+                elevation: 8,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(28),
+                  side: BorderSide(
+                    color: const Color(0xFFB20000).withOpacity(0.2),
+                    width: 2,
+                  ),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(32.0),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(color: const Color(0xFFB20000), width: 3),
+                        ),
+                        child: CircleAvatar(
+                          radius: 50,
+                          backgroundColor: const Color(0xFFB20000).withOpacity(0.1),
+                          child: const Icon(
+                            Icons.person_rounded,
+                            size: 60,
+                            color: Color(0xFFB20000),
                           ),
-                          SizedBox(height: 24),
-                          Text('Profile', style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold, color: Colors.blue)),
-                          SizedBox(height: 24),
-                          Divider(thickness: 1.5),
-                          SizedBox(height: 16),
-                          StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-                            stream: user == null
-                                ? const Stream.empty()
-                                : FirebaseFirestore.instance.collection('users').doc(user.uid).snapshots(),
-                            builder: (context, snap) {
-                              final data = snap.data?.data();
-                              final email = data?['email'] ?? user?.email ?? '';
-                              final name = data?['displayName'] ?? _nameCtrl.text;
-                              final age = data?['age'] ?? _ageCtrl.text;
-                              final gender = data?['gender'] ?? _genderCtrl.text;
-                              return Column(
-                                children: [
-                                  _profileRow('Email', email),
-                                  TextField(
-                                    controller: _nameCtrl,
-                                    decoration: InputDecoration(labelText: 'Name'),
-                                    textInputAction: TextInputAction.next,
-                                  ),
-                                  SizedBox(height: 12),
-                                  TextField(
-                                    controller: _ageCtrl,
-                                    decoration: InputDecoration(labelText: 'Age'),
-                                    keyboardType: TextInputType.number,
-                                    textInputAction: TextInputAction.next,
-                                  ),
-                                  SizedBox(height: 12),
-                                  TextField(
-                                    controller: _genderCtrl,
-                                    decoration: InputDecoration(labelText: 'Gender'),
-                                    textInputAction: TextInputAction.done,
-                                  ),
-                                  SizedBox(height: 20),
-                                  SizedBox(
-                                    width: double.infinity,
-                                    child: ElevatedButton(
-                                      onPressed: _saving ? null : _save,
-                                      child: Text(_saving ? 'Saving...' : 'Save'),
-                                    ),
-                                  ),
-                                  SizedBox(height: 16),
-                                  _profileRow('Live Name', name),
-                                  _profileRow('Live Age', age),
-                                  _profileRow('Live Gender', gender),
-                                ],
-                              );
-                            },
-                          ),
-                        ],
+                        ),
                       ),
-                    ),
+                      const SizedBox(height: 24),
+                      Container(
+                        padding:
+                            const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFB20000).withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: const [
+                            Icon(
+                              Icons.account_circle_outlined,
+                              color: Color(0xFFB20000),
+                              size: 24,
+                            ),
+                            SizedBox(width: 8),
+                            Text(
+                              'Profile',
+                              style: TextStyle(
+                                fontSize: 28,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFFB20000),
+                                letterSpacing: 0.5,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 28),
+                      Container(
+                        height: 2,
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [
+                              Colors.transparent,
+                              const Color(0xFFB20000).withOpacity(0.3),
+                              Colors.transparent,
+                            ],
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+
+                      // Live Firestore Data
+                      StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+                        stream: user == null
+                            ? const Stream.empty()
+                            : FirebaseFirestore.instance
+                                .collection('users')
+                                .doc(user.uid)
+                                .snapshots(),
+                        builder: (context, snap) {
+                          final data = snap.data?.data();
+                          final email = data?['email'] ?? user?.email ?? '';
+                          final name = data?['displayName'] ?? _nameCtrl.text;
+                          final age = data?['age'] ?? _ageCtrl.text;
+                          final gender = data?['gender'] ?? _genderCtrl.text;
+
+                          return Column(
+                            children: [
+                              _profileRow('Email', email),
+                              TextField(
+                                controller: _nameCtrl,
+                                decoration:
+                                    const InputDecoration(labelText: 'Name'),
+                                textInputAction: TextInputAction.next,
+                              ),
+                              const SizedBox(height: 12),
+                              TextField(
+                                controller: _ageCtrl,
+                                decoration:
+                                    const InputDecoration(labelText: 'Age'),
+                                keyboardType: TextInputType.number,
+                                textInputAction: TextInputAction.next,
+                              ),
+                              const SizedBox(height: 12),
+                              TextField(
+                                controller: _genderCtrl,
+                                decoration:
+                                    const InputDecoration(labelText: 'Gender'),
+                                textInputAction: TextInputAction.done,
+                              ),
+                              const SizedBox(height: 20),
+                              SizedBox(
+                                width: double.infinity,
+                                child: ElevatedButton(
+                                  onPressed: _saving ? null : _save,
+                                  child: Text(_saving ? 'Saving...' : 'Save'),
+                                ),
+                              ),
+                              const SizedBox(height: 16),
+                              _profileRow('Live Name', name),
+                              _profileRow('Live Age', age),
+                              _profileRow('Live Gender', gender),
+                            ],
+                          );
+                        },
+                      ),
+                    ],
                   ),
                 ),
               ),
@@ -174,14 +236,59 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Widget _profileRow(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 8.0),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFFFFFEF0).withOpacity(0.6),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFB20000).withOpacity(0.2)),
+      ),
       child: Row(
         children: [
-          Text('$label:', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: Colors.indigo)),
-          SizedBox(width: 12),
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: const Color(0xFFB20000).withOpacity(0.1),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(
+              label.contains('Email')
+                  ? Icons.email_outlined
+                  : label.contains('Name')
+                      ? Icons.person_outline
+                      : label.contains('Age')
+                          ? Icons.cake_outlined
+                          : Icons.info_outline,
+              color: const Color(0xFFB20000),
+              size: 20,
+            ),
+          ),
+          const SizedBox(width: 16),
           Expanded(
-            child: Text(value, style: TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.bold)),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: const Color(0xFFB20000).withOpacity(0.7),
+                    letterSpacing: 0.5,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  value.isEmpty ? 'Not set' : value,
+                  style: const TextStyle(
+                    fontSize: 17,
+                    color: Colors.black87,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       ),

@@ -34,37 +34,69 @@ class CareerApp extends StatelessWidget {
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
-        title: 'Career Guidance',
+        title: 'DIRECTIONS',
         theme: ThemeData(
           useMaterial3: true,
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.indigo, brightness: Brightness.light),
-          fontFamily: 'Roboto',
+          colorScheme: ColorScheme.fromSeed(
+            seedColor: const Color(0xFFB20000),
+            primary: const Color(0xFFB20000), // Deep red
+            secondary: const Color(0xFFFFFEF0), // Warm beige
+            surface: const Color(0xFFFFFEF0), // Light beige
+            brightness: Brightness.light,
+          ),
+          fontFamily: 'Poppins',
+          scaffoldBackgroundColor: const Color(0xFFFFFEF0),
           elevatedButtonTheme: ElevatedButtonThemeData(
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.indigo,
+              backgroundColor: const Color(0xFFB20000),
               foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-              elevation: 4,
-              textStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+              elevation: 0,
+              padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+              textStyle: const TextStyle(
+                fontWeight: FontWeight.w600, 
+                fontSize: 16,
+                letterSpacing: 0.5,
+              ),
             ),
           ),
           appBarTheme: const AppBarTheme(
-            backgroundColor: Colors.indigo,
+            backgroundColor: Color(0xFFB20000),
             foregroundColor: Colors.white,
-            elevation: 2,
+            elevation: 0,
             centerTitle: true,
-            titleTextStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 22, color: Colors.white),
+            titleTextStyle: TextStyle(
+              fontWeight: FontWeight.w700, 
+              fontSize: 24, 
+              color: Colors.white,
+              letterSpacing: 1.2,
+            ),
           ),
           cardTheme: CardThemeData(
             color: Colors.white,
-            elevation: 3,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-            margin: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+            elevation: 0,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(24),
+              side: BorderSide(color: const Color(0xFFB20000).withOpacity(0.1), width: 1),
+            ),
+            margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
           ),
           inputDecorationTheme: InputDecorationTheme(
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(16),
+              borderSide: BorderSide(color: const Color(0xFFB20000).withOpacity(0.3)),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(16),
+              borderSide: BorderSide(color: const Color(0xFFB20000).withOpacity(0.2)),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(16),
+              borderSide: const BorderSide(color: Color(0xFFB20000), width: 2),
+            ),
             filled: true,
-            fillColor: Colors.grey[100],
+            fillColor: const Color(0xFFFFFEF0).withOpacity(0.5),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
           ),
         ),
         home: const SplashScreen(),

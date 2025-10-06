@@ -47,9 +47,8 @@ class _HomeScreenState extends State<HomeScreen> {
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
-              Colors.indigo.shade600,
-              Colors.blue.shade400,
-              Colors.cyan.shade300,
+              Color(0xFFB20000), // Deep red
+              Color(0xFFD32F2F), // Lighter red
             ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
@@ -58,114 +57,128 @@ class _HomeScreenState extends State<HomeScreen> {
         child: SafeArea(
           child: Column(
             children: [
-              // Header
+              // Header with App Name
               Padding(
                 padding: const EdgeInsets.all(24.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                child: Column(
                   children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          'Welcome back,',
-                          style: TextStyle(
-                            color: Colors.white.withOpacity(0.9),
-                            fontSize: 16,
-                          ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'DIRECTIONS',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 32,
+                                fontWeight: FontWeight.w800,
+                                letterSpacing: 2.0,
+                              ),
+                            ),
+                            SizedBox(height: 8),
+                            Text(
+                              'Find Your Path',
+                              style: TextStyle(
+                                color: Color(0xFFFFFEF0),
+                                fontSize: 14,
+                                fontWeight: FontWeight.w400,
+                                letterSpacing: 1.0,
+                              ),
+                            ),
+                          ],
                         ),
-                        SizedBox(height: 4),
-                        Text(
-                          userName,
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 28,
-                            fontWeight: FontWeight.bold,
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: IconButton(
+                            icon: Icon(Icons.logout_rounded, color: Colors.white),
+                            onPressed: _logout,
+                            tooltip: 'Logout',
                           ),
                         ),
                       ],
                     ),
-                    IconButton(
-                      icon: Icon(Icons.logout, color: Colors.white),
-                      onPressed: _logout,
-                      tooltip: 'Logout',
+                    SizedBox(height: 20),
+                    Container(
+                      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.15),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                          color: Color(0xFFFFFEF0).withOpacity(0.3),
+                          width: 1,
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(Icons.waving_hand_rounded, color: Color(0xFFFFFEF0), size: 20),
+                          SizedBox(width: 12),
+                          Text(
+                            'Welcome back, $userName',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
               ),
               
-              // Title
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
-                child: Text(
-                  'What would you like to do today?',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 20,
-                    fontWeight: FontWeight.w500,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-              
               // Cards
               Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.all(24.0),
-                  child: GridView.count(
-                    crossAxisCount: 2,
-                    mainAxisSpacing: 20,
-                    crossAxisSpacing: 20,
-                    children: [
-                      _buildOptionCard(
-                        context,
-                        'Take Quiz',
-                        Icons.quiz,
-                        Colors.purple.shade400,
-                        () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (_) => const QuizScreen()),
-                          );
-                        },
-                      ),
-                      _buildOptionCard(
-                        context,
-                        'Check Results',
-                        Icons.emoji_events,
-                        Colors.orange.shade400,
-                        () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (_) => const ResultsScreen()),
-                          );
-                        },
-                      ),
-                      _buildOptionCard(
-                        context,
-                        'Profile',
-                        Icons.person,
-                        Colors.teal.shade400,
-                        () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (_) => const ProfileScreen()),
-                          );
-                        },
-                      ),
-                      _buildOptionCard(
-                        context,
-                        'Journal',
-                        Icons.book,
-                        Colors.green.shade400,
-                        () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (_) => const JournalingScreen()),
-                          );
-                        },
-                      ),
-                    ],
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Color(0xFFFFFEF0), // Light beige background
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(32),
+                      topRight: Radius.circular(32),
+                    ),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(24.0),
+                    child: GridView.count(
+                      crossAxisCount: 2,
+                      mainAxisSpacing: 16,
+                      crossAxisSpacing: 16,
+                      children: [
+                        _buildOptionCard(
+                          context,
+                          'Take Quiz',
+                          Icons.lightbulb_rounded,
+                          Color(0xFFB20000),
+                          Color(0xFFD32F2F),
+                        ),
+                        _buildOptionCard(
+                          context,
+                          'Results',
+                          Icons.auto_graph_rounded,
+                          Color(0xFF8B4513),
+                          Color(0xFFA0522D),
+                        ),
+                        _buildOptionCard(
+                          context,
+                          'Profile',
+                          Icons.account_circle_rounded,
+                          Color(0xFFB20000),
+                          Color(0xFFD32F2F),
+                        ),
+                        _buildOptionCard(
+                          context,
+                          'Journal',
+                          Icons.menu_book_rounded,
+                          Color(0xFF8B4513),
+                          Color(0xFFA0522D),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -180,59 +193,64 @@ class _HomeScreenState extends State<HomeScreen> {
     BuildContext context,
     String title,
     IconData icon,
-    Color color,
-    VoidCallback onTap,
+    Color startColor,
+    Color endColor,
   ) {
     return GestureDetector(
-      onTap: onTap,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(24),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-          child: Container(
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.2),
-              borderRadius: BorderRadius.circular(24),
-              border: Border.all(
-                color: Colors.white.withOpacity(0.3),
-                width: 1.5,
+      onTap: () {
+        if (title == 'Take Quiz') {
+          Navigator.push(context, MaterialPageRoute(builder: (_) => const QuizScreen()));
+        } else if (title == 'Results') {
+          Navigator.push(context, MaterialPageRoute(builder: (_) => const ResultsScreen()));
+        } else if (title == 'Profile') {
+          Navigator.push(context, MaterialPageRoute(builder: (_) => const ProfileScreen()));
+        } else if (title == 'Journal') {
+          Navigator.push(context, MaterialPageRoute(builder: (_) => const JournalingScreen()));
+        }
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [startColor, endColor],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(24),
+          boxShadow: [
+            BoxShadow(
+              color: startColor.withOpacity(0.3),
+              blurRadius: 12,
+              offset: Offset(0, 6),
+            ),
+          ],
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              padding: EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.2),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                icon,
+                size: 48,
+                color: Colors.white,
               ),
             ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  padding: EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: color,
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: color.withOpacity(0.4),
-                        blurRadius: 12,
-                        spreadRadius: 2,
-                      ),
-                    ],
-                  ),
-                  child: Icon(
-                    icon,
-                    size: 40,
-                    color: Colors.white,
-                  ),
-                ),
-                SizedBox(height: 16),
-                Text(
-                  title,
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ],
+            SizedBox(height: 16),
+            Text(
+              title,
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                letterSpacing: 0.5,
+              ),
+              textAlign: TextAlign.center,
             ),
-          ),
+          ],
         ),
       ),
     );

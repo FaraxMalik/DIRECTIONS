@@ -52,17 +52,75 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.blue,
-      body: Center(
-        child: SingleChildScrollView(
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              Color(0xFFB20000), // Deep red
+              Color(0xFFD32F2F), // Lighter red
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
+        child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.school, size: 80, color: Colors.white),
-              const SizedBox(height: 24),
-              const Text('Career Guidance', style: TextStyle(fontSize: 32, color: Colors.white, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 16),
-              const CircularProgressIndicator(color: Colors.white),
+              // Animated Icon
+              FadeTransition(
+                opacity: _animationController,
+                child: Container(
+                  padding: EdgeInsets.all(32),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.2),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.explore_rounded,
+                    size: 80,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 40),
+              // App Name
+              ScaleTransition(
+                scale: _animationController,
+                child: Column(
+                  children: [
+                    Text(
+                      'DIRECTIONS',
+                      style: TextStyle(
+                        fontSize: 42,
+                        color: Colors.white,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 3.0,
+                      ),
+                    ),
+                    SizedBox(height: 12),
+                    Text(
+                      'Find Your Path',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Color(0xFFFFFEF0),
+                        fontWeight: FontWeight.w400,
+                        letterSpacing: 1.5,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 40),
+              // Loading Indicator
+              SizedBox(
+                width: 40,
+                height: 40,
+                child: CircularProgressIndicator(
+                  color: Color(0xFFFFFEF0),
+                  strokeWidth: 3,
+                ),
+              ),
             ],
           ),
         ),

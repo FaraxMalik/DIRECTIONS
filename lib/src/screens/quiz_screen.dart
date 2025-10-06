@@ -99,7 +99,6 @@ class _QuizScreenState extends State<QuizScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Career Quiz'),
-        backgroundColor: Colors.indigo,
       ),
       body: _buildBody(context),
     );
@@ -110,7 +109,7 @@ class _QuizScreenState extends State<QuizScreen> {
       return Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [Colors.indigo.shade400, Colors.blueAccent.shade200],
+            colors: [Color(0xFFB20000), Color(0xFF8B0000)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -119,11 +118,16 @@ class _QuizScreenState extends State<QuizScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              CircularProgressIndicator(color: Colors.white),
+              CircularProgressIndicator(color: Color(0xFFFFFEF0)),
               SizedBox(height: 24),
               Text(
-                'Analyzing your answers...',
-                style: TextStyle(color: Colors.white, fontSize: 18),
+                '✨ Analyzing your answers...',
+                style: TextStyle(
+                  color: Color(0xFFFFFEF0), 
+                  fontSize: 20,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 0.5,
+                ),
               ),
             ],
           ),
@@ -137,37 +141,76 @@ class _QuizScreenState extends State<QuizScreen> {
       return Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [Colors.indigo.shade400, Colors.blueAccent.shade200],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
+            colors: [Color(0xFFFFFEF0), Color(0xFFF5E6D3)],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
           ),
         ),
         child: Center(
           child: Padding(
             padding: const EdgeInsets.all(24.0),
             child: Card(
-              elevation: 6,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+              elevation: 8,
+              color: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(28),
+                side: BorderSide(color: Color(0xFFB20000).withOpacity(0.2), width: 2),
+              ),
               child: Padding(
-                padding: const EdgeInsets.all(32.0),
+                padding: const EdgeInsets.all(36.0),
                 child: SingleChildScrollView(
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(Icons.work, size: 64, color: Colors.indigo),
-                      SizedBox(height: 24),
-                      Text(title, style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
-                      SizedBox(height: 16),
-                      Text(description, style: TextStyle(fontSize: 18)),
-                      SizedBox(height: 32),
+                      Container(
+                        padding: EdgeInsets.all(20),
+                        decoration: BoxDecoration(
+                          color: Color(0xFFB20000).withOpacity(0.1),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(Icons.work_outline, size: 64, color: Color(0xFFB20000)),
+                      ),
+                      SizedBox(height: 28),
+                      Text(
+                        title, 
+                        style: TextStyle(
+                          fontSize: 26, 
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFFB20000),
+                          letterSpacing: 0.5,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      SizedBox(height: 20),
+                      Container(
+                        padding: EdgeInsets.all(20),
+                        decoration: BoxDecoration(
+                          color: Color(0xFFFFFEF0),
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: Text(
+                          description, 
+                          style: TextStyle(
+                            fontSize: 17,
+                            color: Colors.black87,
+                            height: 1.6,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                      SizedBox(height: 36),
                       ElevatedButton.icon(
                         onPressed: () => Navigator.of(context).pop(),
-                        icon: Icon(Icons.home),
+                        icon: Icon(Icons.home_rounded),
                         label: Text('Back to Home'),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.indigo,
-                          foregroundColor: Colors.white,
-                          padding: EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                          backgroundColor: Color(0xFFB20000),
+                          foregroundColor: Color(0xFFFFFEF0),
+                          padding: EdgeInsets.symmetric(horizontal: 36, vertical: 18),
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(24),
+                          ),
                         ),
                       ),
                     ],
@@ -188,88 +231,186 @@ class _QuizScreenState extends State<QuizScreen> {
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [Colors.indigo.shade400, Colors.blueAccent.shade200],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
+          colors: [Color(0xFFFFFEF0), Color(0xFFF5E6D3)],
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
         ),
       ),
       child: Center(
         child: Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(32),
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-              child: Card(
-                color: Colors.white.withValues(alpha: 0.85),
-                elevation: 12,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(32)),
-                child: Padding(
-                  padding: const EdgeInsets.all(32.0),
-                  child: SingleChildScrollView(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        AnimatedSwitcher(
-                          duration: Duration(milliseconds: 350),
-                          child: Text('Question ${_current + 1} of ${quizQuestions.length}', key: ValueKey(_current), style: TextStyle(fontSize: 16, color: Colors.indigo, fontWeight: FontWeight.w600)),
+          padding: const EdgeInsets.all(20.0),
+          child: Card(
+            color: Colors.white,
+            elevation: 8,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(28),
+              side: BorderSide(color: Color(0xFFB20000).withOpacity(0.2), width: 2),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(28.0),
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    // Progress indicator
+                    Container(
+                      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                      decoration: BoxDecoration(
+                        color: Color(0xFFB20000).withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: AnimatedSwitcher(
+                        duration: Duration(milliseconds: 350),
+                        child: Row(
+                          key: ValueKey(_current),
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.quiz_outlined, color: Color(0xFFB20000), size: 20),
+                            SizedBox(width: 8),
+                            Text(
+                              'Question ${_current + 1} of ${quizQuestions.length}', 
+                              style: TextStyle(
+                                fontSize: 16, 
+                                color: Color(0xFFB20000), 
+                                fontWeight: FontWeight.w700,
+                                letterSpacing: 0.5,
+                              ),
+                            ),
+                          ],
                         ),
-                        SizedBox(height: 16),
-                        Text(q.question, style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.indigo.shade700)),
-                        SizedBox(height: 24),
-                        ...List.generate(q.options.length, (i) => RadioListTile<String>(
-                          title: Text(q.options[i], style: TextStyle(fontSize: 18)),
-                          value: q.options[i],
-                          groupValue: _selected[_current],
-                          activeColor: Colors.indigo,
-                          onChanged: (val) {
-                            setState(() {
-                              _selected[_current] = val!;
-                              _custom[_current] = '';
-                            });
-                          },
-                        )),
-                        TextField(
-                          controller: textController,
-                          decoration: InputDecoration(
-                            labelText: 'Or write your own answer',
-                            filled: true,
-                            fillColor: Colors.indigo.shade50,
-                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
-                          ),
-                          style: TextStyle(fontSize: 18),
-                          onChanged: (val) {
-                            setState(() {
-                              _custom[_current] = val;
-                              if (val.isNotEmpty) _selected[_current] = '';
-                            });
-                          },
-                        ),
-                        SizedBox(height: 32),
-                        ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.indigo,
-                            foregroundColor: Colors.white,
-                            padding: EdgeInsets.symmetric(vertical: 16),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                            textStyle: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                            elevation: 4,
-                          ),
-                          onPressed: (_selected[_current]?.isNotEmpty == true || _custom[_current]?.isNotEmpty == true)
-                              ? () {
-                                  if (_custom[_current]?.isNotEmpty == true) {
-                                    _custom[_current] = textController.text;
-                                    textController.clear();
-                                  }
-                                  _next();
-                                }
-                              : null,
-                          child: Text(_current < quizQuestions.length - 1 ? 'Next' : 'Submit'),
-                        ),
-                      ],
+                      ),
                     ),
-                  ),
+                    SizedBox(height: 24),
+                    // Question text
+                    Container(
+                      padding: EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [Color(0xFFFFFEF0), Colors.white],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Text(
+                        q.question, 
+                        style: TextStyle(
+                          fontSize: 22, 
+                          fontWeight: FontWeight.bold, 
+                          color: Color(0xFF8B0000),
+                          height: 1.4,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                    SizedBox(height: 28),
+                    // Options
+                    ...List.generate(q.options.length, (i) => Container(
+                      margin: EdgeInsets.only(bottom: 12),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                          color: _selected[_current] == q.options[i] 
+                            ? Color(0xFFB20000) 
+                            : Color(0xFFB20000).withOpacity(0.2),
+                          width: _selected[_current] == q.options[i] ? 2 : 1,
+                        ),
+                        color: _selected[_current] == q.options[i]
+                          ? Color(0xFFB20000).withOpacity(0.05)
+                          : Colors.transparent,
+                      ),
+                      child: RadioListTile<String>(
+                        contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                        title: Text(
+                          q.options[i], 
+                          style: TextStyle(
+                            fontSize: 17,
+                            fontWeight: _selected[_current] == q.options[i] 
+                              ? FontWeight.w600 
+                              : FontWeight.normal,
+                            color: _selected[_current] == q.options[i]
+                              ? Color(0xFFB20000)
+                              : Colors.black87,
+                          ),
+                        ),
+                        value: q.options[i],
+                        groupValue: _selected[_current],
+                        activeColor: Color(0xFFB20000),
+                        onChanged: (val) {
+                          setState(() {
+                            _selected[_current] = val!;
+                            _custom[_current] = '';
+                          });
+                        },
+                      ),
+                    )),
+                    SizedBox(height: 16),
+                    // Custom answer field
+                    TextField(
+                      controller: textController,
+                      decoration: InputDecoration(
+                        labelText: '✍️ Or write your own answer',
+                        labelStyle: TextStyle(color: Color(0xFFB20000).withOpacity(0.7)),
+                        filled: true,
+                        fillColor: Color(0xFFFFFEF0).withOpacity(0.5),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16),
+                          borderSide: BorderSide(color: Color(0xFFB20000).withOpacity(0.3)),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16),
+                          borderSide: BorderSide(color: Color(0xFFB20000).withOpacity(0.3)),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16),
+                          borderSide: BorderSide(color: Color(0xFFB20000), width: 2),
+                        ),
+                      ),
+                      style: TextStyle(fontSize: 17),
+                      onChanged: (val) {
+                        setState(() {
+                          _custom[_current] = val;
+                          if (val.isNotEmpty) _selected[_current] = '';
+                        });
+                      },
+                    ),
+                    SizedBox(height: 32),
+                    // Next/Submit button
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Color(0xFFB20000),
+                        foregroundColor: Color(0xFFFFFEF0),
+                        disabledBackgroundColor: Color(0xFFB20000).withOpacity(0.3),
+                        disabledForegroundColor: Color(0xFFFFFEF0).withOpacity(0.5),
+                        padding: EdgeInsets.symmetric(vertical: 18),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+                        textStyle: TextStyle(
+                          fontSize: 18, 
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 0.8,
+                        ),
+                        elevation: 0,
+                      ),
+                      onPressed: (_selected[_current]?.isNotEmpty == true || _custom[_current]?.isNotEmpty == true)
+                          ? () {
+                              if (_custom[_current]?.isNotEmpty == true) {
+                                _custom[_current] = textController.text;
+                                textController.clear();
+                              }
+                              _next();
+                            }
+                          : null,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(_current < quizQuestions.length - 1 ? 'Next Question' : 'Submit Quiz'),
+                          SizedBox(width: 8),
+                          Icon(_current < quizQuestions.length - 1 ? Icons.arrow_forward_rounded : Icons.check_circle_outline, size: 22),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
