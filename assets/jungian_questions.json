@@ -1,0 +1,363 @@
+[
+  {
+    "id": 1,
+    "text": "You find it takes effort to introduce yourself to other people.",
+    "dimension": "E",
+    "reverse": true
+  },
+  {
+    "id": 2,
+    "text": "You often get so lost in thoughts that you ignore or forget your surroundings.",
+    "dimension": "S",
+    "reverse": true
+  },
+  {
+    "id": 3,
+    "text": "You try to respond to your emails as soon as possible and cannot stand a messy inbox.",
+    "dimension": "J",
+    "reverse": false
+  },
+  {
+    "id": 4,
+    "text": "You find it easy to stay relaxed and focused even when there is some pressure.",
+    "dimension": "T",
+    "reverse": false
+  },
+  {
+    "id": 5,
+    "text": "You do not usually initiate conversations.",
+    "dimension": "E",
+    "reverse": true
+  },
+  {
+    "id": 6,
+    "text": "You rarely do something just out of sheer curiosity.",
+    "dimension": "N",
+    "reverse": true
+  },
+  {
+    "id": 7,
+    "text": "You feel superior to other people.",
+    "dimension": "T",
+    "reverse": false
+  },
+  {
+    "id": 8,
+    "text": "Being organized is more important to you than being adaptable.",
+    "dimension": "J",
+    "reverse": false
+  },
+  {
+    "id": 9,
+    "text": "You are usually highly motivated and energetic.",
+    "dimension": "E",
+    "reverse": false
+  },
+  {
+    "id": 10,
+    "text": "Winning a debate matters less to you than making sure no one gets upset.",
+    "dimension": "F",
+    "reverse": false
+  },
+  {
+    "id": 11,
+    "text": "You often feel as if you have to justify yourself to other people.",
+    "dimension": "F",
+    "reverse": false
+  },
+  {
+    "id": 12,
+    "text": "Your home and work environments are quite tidy.",
+    "dimension": "J",
+    "reverse": false
+  },
+  {
+    "id": 13,
+    "text": "You do not mind being at the center of attention.",
+    "dimension": "E",
+    "reverse": false
+  },
+  {
+    "id": 14,
+    "text": "You consider yourself more practical than creative.",
+    "dimension": "S",
+    "reverse": false
+  },
+  {
+    "id": 15,
+    "text": "You usually base your decisions on facts rather than feelings.",
+    "dimension": "T",
+    "reverse": false
+  },
+  {
+    "id": 16,
+    "text": "Your living and working spaces are clean and organized.",
+    "dimension": "J",
+    "reverse": false
+  },
+  {
+    "id": 17,
+    "text": "You avoid making phone calls.",
+    "dimension": "E",
+    "reverse": true
+  },
+  {
+    "id": 18,
+    "text": "You often spend time exploring unrealistic and impractical yet intriguing ideas.",
+    "dimension": "N",
+    "reverse": false
+  },
+  {
+    "id": 19,
+    "text": "You think that everyone's views should be respected regardless of whether they are supported by facts or not.",
+    "dimension": "F",
+    "reverse": false
+  },
+  {
+    "id": 20,
+    "text": "You prefer to do your chores before allowing yourself to relax.",
+    "dimension": "J",
+    "reverse": false
+  },
+  {
+    "id": 21,
+    "text": "You enjoy participating in group activities.",
+    "dimension": "E",
+    "reverse": false
+  },
+  {
+    "id": 22,
+    "text": "You like books and movies that make you come up with your own interpretation of the ending.",
+    "dimension": "N",
+    "reverse": false
+  },
+  {
+    "id": 23,
+    "text": "Your happiness comes more from helping others accomplish things than your own accomplishments.",
+    "dimension": "F",
+    "reverse": false
+  },
+  {
+    "id": 24,
+    "text": "You are interested in so many things that you find it difficult to choose what to try next.",
+    "dimension": "P",
+    "reverse": false
+  },
+  {
+    "id": 25,
+    "text": "You are a relatively reserved and quiet person.",
+    "dimension": "I",
+    "reverse": false
+  },
+  {
+    "id": 26,
+    "text": "If you had a business, you would find it very difficult to fire loyal but underperforming employees.",
+    "dimension": "F",
+    "reverse": false
+  },
+  {
+    "id": 27,
+    "text": "You often contemplate the reasons for human existence.",
+    "dimension": "N",
+    "reverse": false
+  },
+  {
+    "id": 28,
+    "text": "Logic is usually more important than heart when it comes to making important decisions.",
+    "dimension": "T",
+    "reverse": false
+  },
+  {
+    "id": 29,
+    "text": "You usually prefer just doing what you feel like at any given moment instead of planning a particular daily routine.",
+    "dimension": "P",
+    "reverse": false
+  },
+  {
+    "id": 30,
+    "text": "You rarely worry about whether you make a good impression on people you meet.",
+    "dimension": "I",
+    "reverse": false
+  },
+  {
+    "id": 31,
+    "text": "You enjoy experimenting with new and untested approaches.",
+    "dimension": "N",
+    "reverse": false
+  },
+  {
+    "id": 32,
+    "text": "You prioritize and plan tasks effectively, often completing them well before the deadline.",
+    "dimension": "J",
+    "reverse": false
+  },
+  {
+    "id": 33,
+    "text": "You are not easily affected by strong emotions.",
+    "dimension": "T",
+    "reverse": false
+  },
+  {
+    "id": 34,
+    "text": "You have a system for everything you do.",
+    "dimension": "J",
+    "reverse": false
+  },
+  {
+    "id": 35,
+    "text": "You become bored or lose interest when the discussion gets highly theoretical.",
+    "dimension": "S",
+    "reverse": false
+  },
+  {
+    "id": 36,
+    "text": "You find it easy to empathize with a person whose experiences are very different from yours.",
+    "dimension": "F",
+    "reverse": false
+  },
+  {
+    "id": 37,
+    "text": "You usually postpone finalizing decisions for as long as possible.",
+    "dimension": "P",
+    "reverse": false
+  },
+  {
+    "id": 38,
+    "text": "You rarely second-guess the choices that you have made.",
+    "dimension": "T",
+    "reverse": false
+  },
+  {
+    "id": 39,
+    "text": "After a long and exhausting week, a lively social event is just what you need.",
+    "dimension": "E",
+    "reverse": false
+  },
+  {
+    "id": 40,
+    "text": "You enjoy going to art museums.",
+    "dimension": "N",
+    "reverse": false
+  },
+  {
+    "id": 41,
+    "text": "You often have a hard time understanding other people's feelings.",
+    "dimension": "T",
+    "reverse": false
+  },
+  {
+    "id": 42,
+    "text": "You like to have a to-do list for each day.",
+    "dimension": "J",
+    "reverse": false
+  },
+  {
+    "id": 43,
+    "text": "You rarely feel insecure.",
+    "dimension": "E",
+    "reverse": false
+  },
+  {
+    "id": 44,
+    "text": "You have no difficulties coming up with a personal timetable and sticking to it.",
+    "dimension": "J",
+    "reverse": false
+  },
+  {
+    "id": 45,
+    "text": "Being right is more important than being cooperative when it comes to teamwork.",
+    "dimension": "T",
+    "reverse": false
+  },
+  {
+    "id": 46,
+    "text": "You are very intrigued by things labeled as controversial.",
+    "dimension": "N",
+    "reverse": false
+  },
+  {
+    "id": 47,
+    "text": "You would rather improvise than spend time coming up with a detailed plan.",
+    "dimension": "P",
+    "reverse": false
+  },
+  {
+    "id": 48,
+    "text": "You are a person of few words.",
+    "dimension": "I",
+    "reverse": false
+  },
+  {
+    "id": 49,
+    "text": "You often take initiative in social situations.",
+    "dimension": "E",
+    "reverse": false
+  },
+  {
+    "id": 50,
+    "text": "You prioritize facts over people's feelings when determining a course of action.",
+    "dimension": "T",
+    "reverse": false
+  },
+  {
+    "id": 51,
+    "text": "You often allow the day to unfold without any schedule at all.",
+    "dimension": "P",
+    "reverse": false
+  },
+  {
+    "id": 52,
+    "text": "You are still bothered by mistakes that you made a long time ago.",
+    "dimension": "F",
+    "reverse": false
+  },
+  {
+    "id": 53,
+    "text": "You prefer to completely finish one project before starting another.",
+    "dimension": "J",
+    "reverse": false
+  },
+  {
+    "id": 54,
+    "text": "You are very good at improvising in difficult situations.",
+    "dimension": "P",
+    "reverse": false
+  },
+  {
+    "id": 55,
+    "text": "You are very sentimental.",
+    "dimension": "F",
+    "reverse": false
+  },
+  {
+    "id": 56,
+    "text": "You like to use organizing tools like schedules and lists.",
+    "dimension": "J",
+    "reverse": false
+  },
+  {
+    "id": 57,
+    "text": "Even a small mistake can cause you to doubt your overall abilities and knowledge.",
+    "dimension": "F",
+    "reverse": false
+  },
+  {
+    "id": 58,
+    "text": "You feel comfortable just walking up to someone you find interesting and striking up a conversation.",
+    "dimension": "E",
+    "reverse": false
+  },
+  {
+    "id": 59,
+    "text": "You are not too interested in discussing various interpretations and analyses of creative works.",
+    "dimension": "S",
+    "reverse": false
+  },
+  {
+    "id": 60,
+    "text": "You are more inclined to follow your head than your heart.",
+    "dimension": "T",
+    "reverse": false
+  }
+]
+
