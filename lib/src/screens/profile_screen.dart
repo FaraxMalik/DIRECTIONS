@@ -79,190 +79,266 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final user = FirebaseAuth.instance.currentUser;
 
     return Scaffold(
+      backgroundColor: const Color(0xFFFFFEF0),
       appBar: AppBar(
         title: const Text('Your Profile'),
+        elevation: 0,
       ),
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Color(0xFFFFFEF0), Color(0xFFF5E6D3)],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-          ),
-        ),
-        child: Center(
-          child: SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.all(24.0),
-              child: Card(
-                color: Colors.white,
-                elevation: 8,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(28),
-                  side: BorderSide(
-                    color: const Color(0xFFB20000).withOpacity(0.2),
-                    width: 2,
-                  ),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(32.0),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(4),
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(color: const Color(0xFFB20000), width: 3),
-                        ),
-                        child: CircleAvatar(
-                          radius: 50,
-                          backgroundColor: const Color(0xFFB20000).withOpacity(0.1),
-                          child: const Icon(
-                            Icons.person_rounded,
-                            size: 60,
-                            color: Color(0xFFB20000),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 24),
-                      Container(
-                        padding:
-                            const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFB20000).withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: const [
-                            Icon(
-                              Icons.account_circle_outlined,
-                              color: Color(0xFFB20000),
-                              size: 24,
-                            ),
-                            SizedBox(width: 8),
-                            Text(
-                              'Profile',
-                              style: TextStyle(
-                                fontSize: 28,
-                                fontWeight: FontWeight.bold,
-                                color: Color(0xFFB20000),
-                                letterSpacing: 0.5,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 28),
-                      Container(
-                        height: 2,
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [
-                              Colors.transparent,
-                              const Color(0xFFB20000).withOpacity(0.3),
-                              Colors.transparent,
-                            ],
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 24),
-
-                      // Live Firestore Data
-                      StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-                        stream: user == null
-                            ? const Stream.empty()
-                            : FirebaseFirestore.instance
-                                .collection('users')
-                                .doc(user.uid)
-                                .snapshots(),
-                        builder: (context, snap) {
-                          final data = snap.data?.data();
-                          final email = data?['email'] ?? user?.email ?? '';
-                          final name = data?['displayName'] ?? _nameCtrl.text;
-                          final age = data?['age'] ?? _ageCtrl.text;
-                          final gender = data?['gender'] ?? _genderCtrl.text;
-
-                          return Column(
-                            children: [
-                              _profileRow('Email', email),
-                              TextField(
-                                controller: _nameCtrl,
-                                decoration:
-                                    const InputDecoration(labelText: 'Name'),
-                                textInputAction: TextInputAction.next,
-                              ),
-                              const SizedBox(height: 12),
-                              TextField(
-                                controller: _ageCtrl,
-                                decoration:
-                                    const InputDecoration(labelText: 'Age'),
-                                keyboardType: TextInputType.number,
-                                textInputAction: TextInputAction.next,
-                              ),
-                              const SizedBox(height: 12),
-                              TextField(
-                                controller: _genderCtrl,
-                                decoration:
-                                    const InputDecoration(labelText: 'Gender'),
-                                textInputAction: TextInputAction.done,
-                              ),
-                              const SizedBox(height: 20),
-                              SizedBox(
-                                width: double.infinity,
-                                child: ElevatedButton(
-                                  onPressed: _saving ? null : _save,
-                                  child: Text(_saving ? 'Saving...' : 'Save'),
-                                ),
-                              ),
-                              const SizedBox(height: 16),
-                              _profileRow('Live Name', name),
-                              _profileRow('Live Age', age),
-                              _profileRow('Live Gender', gender),
-                            ],
-                          );
-                        },
-                      ),
-                    ],
-                  ),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            // Header Section with Avatar
+            Container(
+              width: double.infinity,
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [Color(0xFFB20000), Color(0xFF8B0000)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
                 ),
               ),
+              padding: const EdgeInsets.symmetric(vertical: 40),
+              child: Column(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(color: Colors.white, width: 4),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.3),
+                          blurRadius: 20,
+                          offset: const Offset(0, 8),
+                        ),
+                      ],
+                    ),
+                    child: const CircleAvatar(
+                      radius: 60,
+                      backgroundColor: Colors.white,
+                      child: Icon(
+                        Icons.person_rounded,
+                        size: 70,
+                        color: Color(0xFFB20000),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+                    stream: user == null
+                        ? const Stream.empty()
+                        : FirebaseFirestore.instance
+                            .collection('users')
+                            .doc(user.uid)
+                            .snapshots(),
+                    builder: (context, snap) {
+                      final data = snap.data?.data();
+                      final name = data?['displayName'] ?? _nameCtrl.text;
+                      return Text(
+                        name.isNotEmpty ? name : 'Welcome',
+                        style: const TextStyle(
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                          letterSpacing: 0.5,
+                        ),
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    user?.email ?? '',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.white.withOpacity(0.9),
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
+            
+            // Form Section
+            Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+                stream: user == null
+                    ? const Stream.empty()
+                    : FirebaseFirestore.instance
+                        .collection('users')
+                        .doc(user.uid)
+                        .snapshots(),
+                builder: (context, snap) {
+                  final data = snap.data?.data();
+                  final name = data?['displayName'] ?? _nameCtrl.text;
+                  final age = data?['age'] ?? _ageCtrl.text;
+                  final gender = data?['gender'] ?? _genderCtrl.text;
+
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Edit Profile Section
+                      const Text(
+                        'Edit Profile',
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFFB20000),
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      
+                      // Name Field
+                      _buildInputField(
+                        controller: _nameCtrl,
+                        label: 'Full Name',
+                        icon: Icons.person_outline,
+                        textInputAction: TextInputAction.next,
+                      ),
+                      const SizedBox(height: 16),
+                      
+                      // Age Field
+                      _buildInputField(
+                        controller: _ageCtrl,
+                        label: 'Age',
+                        icon: Icons.cake_outlined,
+                        keyboardType: TextInputType.number,
+                        textInputAction: TextInputAction.next,
+                      ),
+                      const SizedBox(height: 16),
+                      
+                      // Gender Field
+                      _buildInputField(
+                        controller: _genderCtrl,
+                        label: 'Gender',
+                        icon: Icons.wc_outlined,
+                        textInputAction: TextInputAction.done,
+                      ),
+                      const SizedBox(height: 28),
+                      
+                      // Save Button
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: _saving ? null : _save,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFFB20000),
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 18),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            elevation: 0,
+                          ),
+                          child: _saving
+                              ? const SizedBox(
+                                  height: 20,
+                                  width: 20,
+                                  child: CircularProgressIndicator(
+                                    color: Colors.white,
+                                    strokeWidth: 2,
+                                  ),
+                                )
+                              : const Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(Icons.save_outlined),
+                                    SizedBox(width: 8),
+                                    Text(
+                                      'Save Changes',
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                        ),
+                      ),
+                      const SizedBox(height: 32),
+                      
+                      // Current Data Section
+                      const Text(
+                        'Current Profile Data',
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFFB20000),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      _buildDataCard('Name', name.isNotEmpty ? name : 'Not set', Icons.person),
+                      const SizedBox(height: 12),
+                      _buildDataCard('Age', age.toString().isNotEmpty ? age.toString() : 'Not set', Icons.cake),
+                      const SizedBox(height: 12),
+                      _buildDataCard('Gender', gender.toString().isNotEmpty ? gender.toString() : 'Not set', Icons.wc),
+                      const SizedBox(height: 20),
+                    ],
+                  );
+                },
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 
-  Widget _profileRow(String label, String value) {
+  Widget _buildInputField({
+    required TextEditingController controller,
+    required String label,
+    required IconData icon,
+    TextInputType? keyboardType,
+    TextInputAction? textInputAction,
+  }) {
     return Container(
-      margin: const EdgeInsets.symmetric(vertical: 8.0),
-      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFFFFFEF0).withOpacity(0.6),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: TextField(
+        controller: controller,
+        keyboardType: keyboardType,
+        textInputAction: textInputAction,
+        decoration: InputDecoration(
+          labelText: label,
+          labelStyle: TextStyle(color: const Color(0xFFB20000).withOpacity(0.7)),
+          prefixIcon: Icon(icon, color: const Color(0xFFB20000)),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(16),
+            borderSide: BorderSide.none,
+          ),
+          filled: true,
+          fillColor: Colors.white,
+          contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDataCard(String label, String value, IconData icon) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: const Color(0xFFB20000).withOpacity(0.2)),
       ),
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(8),
+            padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
               color: const Color(0xFFB20000).withOpacity(0.1),
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(12),
             ),
-            child: Icon(
-              label.contains('Email')
-                  ? Icons.email_outlined
-                  : label.contains('Name')
-                      ? Icons.person_outline
-                      : label.contains('Age')
-                          ? Icons.cake_outlined
-                          : Icons.info_outline,
-              color: const Color(0xFFB20000),
-              size: 20,
-            ),
+            child: Icon(icon, color: const Color(0xFFB20000), size: 24),
           ),
           const SizedBox(width: 16),
           Expanded(
@@ -273,16 +349,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   label,
                   style: TextStyle(
                     fontSize: 14,
+                    color: Colors.grey[600],
                     fontWeight: FontWeight.w500,
-                    color: const Color(0xFFB20000).withOpacity(0.7),
-                    letterSpacing: 0.5,
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  value.isEmpty ? 'Not set' : value,
+                  value,
                   style: const TextStyle(
-                    fontSize: 17,
+                    fontSize: 18,
                     color: Colors.black87,
                     fontWeight: FontWeight.w600,
                   ),

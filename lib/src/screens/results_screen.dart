@@ -28,222 +28,332 @@ class _ResultsScreenState extends State<ResultsScreen> {
     final loading = resultsService.loading;
 
     return Scaffold(
+      backgroundColor: const Color(0xFFFFFEF0),
       appBar: AppBar(
-        title: Text('Your Results'),
+        title: const Text('Your Results'),
+        elevation: 0,
       ),
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Color(0xFFFFFEF0), Color(0xFFF5E6D3)],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-          ),
-        ),
-        child: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(24.0),
-            child: Card(
-              color: Colors.white,
-              elevation: 8,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(28),
-                side: BorderSide(color: Color(0xFFB20000).withOpacity(0.2), width: 2),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(32.0),
-                child: loading
-                    ? Center(
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            CircularProgressIndicator(color: Color(0xFFB20000)),
-                            SizedBox(height: 16),
-                            Text(
-                              'Loading results...', 
-                              style: TextStyle(
-                                fontSize: 17, 
-                                color: Color(0xFFB20000),
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ],
+      body: loading
+          ? Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(40),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(0xFFB20000).withOpacity(0.2),
+                          blurRadius: 30,
+                          spreadRadius: 10,
                         ),
-                      )
-                    : results.isEmpty
-                        ? Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Container(
-                                padding: EdgeInsets.all(24),
-                                decoration: BoxDecoration(
-                                  color: Color(0xFFB20000).withOpacity(0.1),
-                                  shape: BoxShape.circle,
-                                ),
-                                child: Icon(Icons.inbox_outlined, size: 80, color: Color(0xFFB20000)),
-                              ),
-                              SizedBox(height: 28),
-                              Text(
-                                'You haven\'t taken any quiz yet!',
-                                style: TextStyle(
-                                  fontSize: 22, 
-                                  fontWeight: FontWeight.bold, 
-                                  color: Color(0xFFB20000),
-                                  letterSpacing: 0.3,
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                              SizedBox(height: 16),
-                              Container(
-                                padding: EdgeInsets.all(16),
-                                decoration: BoxDecoration(
-                                  color: Color(0xFFFFFEF0),
-                                  borderRadius: BorderRadius.circular(16),
-                                ),
-                                child: Text(
-                                  'Take a career quiz to get personalized recommendations.',
-                                  style: TextStyle(fontSize: 17, color: Colors.grey[700], height: 1.5),
-                                  textAlign: TextAlign.center,
-                                ),
-                              ),
-                              SizedBox(height: 36),
-                              ElevatedButton.icon(
-                                onPressed: () => Navigator.of(context).pop(),
-                                icon: Icon(Icons.arrow_back_rounded),
-                                label: Text('Back to Home'),
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Color(0xFFB20000),
-                                  foregroundColor: Color(0xFFFFFEF0),
-                                  padding: EdgeInsets.symmetric(horizontal: 36, vertical: 18),
-                                  elevation: 0,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(24),
-                                  ),
-                                ),
+                      ],
+                    ),
+                    child: const CircularProgressIndicator(
+                      color: Color(0xFFB20000),
+                      strokeWidth: 4,
+                    ),
+                  ),
+                  const SizedBox(height: 32),
+                  const Text(
+                    'Loading your results...',
+                    style: TextStyle(
+                      fontSize: 20,
+                      color: Color(0xFFB20000),
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            )
+          : results.isEmpty
+              ? Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(32.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(40),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                color: const Color(0xFFB20000).withOpacity(0.1),
+                                blurRadius: 30,
+                                spreadRadius: 10,
                               ),
                             ],
-                          )
-                        : SingleChildScrollView(
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                          ),
+                          child: const Icon(
+                            Icons.article_outlined,
+                            size: 80,
+                            color: Color(0xFFB20000),
+                          ),
+                        ),
+                        const SizedBox(height: 32),
+                        const Text(
+                          'No Results Yet',
+                          style: TextStyle(
+                            fontSize: 28,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFFB20000),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          'Take a career quiz to get personalized recommendations and build your career profile.',
+                          style: TextStyle(
+                            fontSize: 17,
+                            color: Colors.grey[700],
+                            height: 1.6,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 48),
+                        ElevatedButton.icon(
+                          onPressed: () => Navigator.of(context).pop(),
+                          icon: const Icon(Icons.quiz_outlined, size: 24),
+                          label: const Text(
+                            'Take Quiz',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFFB20000),
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 40,
+                              vertical: 20,
+                            ),
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+              : CustomScrollView(
+                  slivers: [
+                    SliverToBoxAdapter(
+                      child: Padding(
+                        padding: const EdgeInsets.all(20.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
                               children: [
                                 Container(
-                                  padding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                                  padding: const EdgeInsets.all(16),
                                   decoration: BoxDecoration(
-                                    gradient: LinearGradient(
-                                      colors: [Color(0xFFB20000).withOpacity(0.1), Colors.transparent],
-                                    ),
-                                    borderRadius: BorderRadius.circular(20),
+                                    color: const Color(0xFFB20000).withOpacity(0.1),
+                                    borderRadius: BorderRadius.circular(16),
                                   ),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
+                                  child: const Icon(
+                                    Icons.emoji_events,
+                                    color: Color(0xFFB20000),
+                                    size: 32,
+                                  ),
+                                ),
+                                const SizedBox(width: 16),
+                                const Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      Icon(Icons.emoji_events_outlined, color: Color(0xFFB20000), size: 28),
-                                      SizedBox(width: 12),
                                       Text(
-                                        'Your Career Results',
+                                        'Career Results',
                                         style: TextStyle(
-                                          fontSize: 26, 
-                                          fontWeight: FontWeight.bold, 
+                                          fontSize: 28,
+                                          fontWeight: FontWeight.bold,
                                           color: Color(0xFFB20000),
-                                          letterSpacing: 0.5,
                                         ),
-                                        textAlign: TextAlign.center,
+                                      ),
+                                      SizedBox(height: 4),
+                                      Text(
+                                        'Your personalized recommendations',
+                                        style: TextStyle(
+                                          fontSize: 15,
+                                          color: Colors.grey,
+                                        ),
                                       ),
                                     ],
                                   ),
                                 ),
-                                SizedBox(height: 24),
-                                Container(
-                                  height: 2,
-                                  decoration: BoxDecoration(
-                                    gradient: LinearGradient(
-                                      colors: [
-                                        Colors.transparent,
-                                        Color(0xFFB20000).withOpacity(0.3),
-                                        Colors.transparent,
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                                SizedBox(height: 24),
-                                ...results.map((result) {
-                                  final description = result.description ?? '';
-                                  final lines = description.split('\n');
-                                  final title = lines.isNotEmpty ? lines[0] : result.recommendedCareers.join(', ');
-                                  final body = lines.length > 1 ? lines.sublist(1).join('\n') : '';
-                                  
-                                  return Container(
-                                    margin: const EdgeInsets.only(bottom: 20.0),
-                                    padding: EdgeInsets.all(20),
-                                    decoration: BoxDecoration(
-                                      color: Color(0xFFFFFEF0).withOpacity(0.5),
-                                      borderRadius: BorderRadius.circular(20),
-                                      border: Border.all(color: Color(0xFFB20000).withOpacity(0.2)),
-                                    ),
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Row(
-                                          children: [
-                                            Container(
-                                              padding: EdgeInsets.all(12),
-                                              decoration: BoxDecoration(
-                                                color: Color(0xFFB20000).withOpacity(0.1),
-                                                borderRadius: BorderRadius.circular(12),
-                                              ),
-                                              child: Icon(Icons.star_rounded, size: 28, color: Color(0xFFB20000)),
-                                            ),
-                                            SizedBox(width: 16),
-                                            Expanded(
-                                              child: Text(
-                                                title,
-                                                style: TextStyle(
-                                                  fontSize: 20, 
-                                                  fontWeight: FontWeight.bold, 
-                                                  color: Color(0xFF8B0000),
-                                                  height: 1.3,
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        SizedBox(height: 16),
-                                        Text(
-                                          body,
-                                          style: TextStyle(
-                                            fontSize: 16, 
-                                            color: Colors.black87,
-                                            height: 1.6,
-                                          ),
-                                        ),
-                                        SizedBox(height: 12),
-                                        Row(
-                                          children: [
-                                            Icon(Icons.calendar_today_outlined, size: 16, color: Color(0xFFB20000).withOpacity(0.6)),
-                                            SizedBox(width: 6),
-                                            Text(
-                                              'Date: ${result.createdAt.toString().split(' ')[0]}',
-                                              style: TextStyle(
-                                                fontSize: 14, 
-                                                color: Color(0xFFB20000).withOpacity(0.7), 
-                                                fontStyle: FontStyle.italic,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                  );
-                                }).toList(),
                               ],
                             ),
-                          ),
-              ),
-            ),
-          ),
-        ),
-      ),
+                            const SizedBox(height: 12),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 12,
+                              ),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFB20000).withOpacity(0.05),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Row(
+                                children: [
+                                  const Icon(
+                                    Icons.info_outline,
+                                    color: Color(0xFFB20000),
+                                    size: 20,
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: Text(
+                                      '${results.length} ${results.length == 1 ? "Result" : "Results"} Found',
+                                      style: const TextStyle(
+                                        color: Color(0xFFB20000),
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 15,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    SliverPadding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      sliver: SliverList(
+                        delegate: SliverChildBuilderDelegate(
+                          (context, index) {
+                            final result = results[index];
+                            final description = result.description ?? '';
+                            final lines = description.split('\n');
+                            final title = lines.isNotEmpty
+                                ? lines[0]
+                                : result.recommendedCareers.join(', ');
+                            final body = lines.length > 1
+                                ? lines.sublist(1).join('\n')
+                                : '';
+
+                            return Container(
+                              margin: const EdgeInsets.only(bottom: 16),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(20),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.05),
+                                    blurRadius: 15,
+                                    offset: const Offset(0, 4),
+                                  ),
+                                ],
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.all(20),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Container(
+                                          padding: const EdgeInsets.all(12),
+                                          decoration: BoxDecoration(
+                                            color: const Color(0xFFB20000)
+                                                .withOpacity(0.1),
+                                            borderRadius:
+                                                BorderRadius.circular(12),
+                                          ),
+                                          child: const Icon(
+                                            Icons.star_rounded,
+                                            size: 28,
+                                            color: Color(0xFFB20000),
+                                          ),
+                                        ),
+                                        const SizedBox(width: 16),
+                                        Expanded(
+                                          child: Text(
+                                            title,
+                                            style: const TextStyle(
+                                              fontSize: 20,
+                                              fontWeight: FontWeight.bold,
+                                              color: Color(0xFF8B0000),
+                                              height: 1.3,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 16),
+                                    Container(
+                                      padding: const EdgeInsets.all(16),
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xFFFFFEF0),
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      child: Text(
+                                        body,
+                                        style: const TextStyle(
+                                          fontSize: 16,
+                                          color: Colors.black87,
+                                          height: 1.6,
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 16),
+                                    Row(
+                                      children: [
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 12,
+                                            vertical: 6,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: const Color(0xFFB20000)
+                                                .withOpacity(0.1),
+                                            borderRadius:
+                                                BorderRadius.circular(8),
+                                          ),
+                                          child: Row(
+                                            children: [
+                                              const Icon(
+                                                Icons.calendar_today,
+                                                size: 14,
+                                                color: Color(0xFFB20000),
+                                              ),
+                                              const SizedBox(width: 6),
+                                              Text(
+                                                result.createdAt
+                                                    .toString()
+                                                    .split(' ')[0],
+                                                style: const TextStyle(
+                                                  fontSize: 13,
+                                                  color: Color(0xFFB20000),
+                                                  fontWeight: FontWeight.w600,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                          childCount: results.length,
+                        ),
+                      ),
+                    ),
+                    const SliverToBoxAdapter(
+                      child: SizedBox(height: 20),
+                    ),
+                  ],
+                ),
     );
   }
 }
