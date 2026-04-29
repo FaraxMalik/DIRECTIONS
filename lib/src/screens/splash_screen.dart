@@ -1,7 +1,8 @@
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'login_screen.dart';
-import 'home_screen.dart';
+import 'package:google_fonts/google_fonts.dart';
+
+import '../theme/app_theme.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -11,120 +12,230 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _animationController;
+    with TickerProviderStateMixin {
+  late final AnimationController _entrance;
+  late final AnimationController _spin;
+  late final Animation<double> _logoScale;
+  late final Animation<double> _fade;
+  late final Animation<Offset> _titleSlide;
 
   @override
   void initState() {
     super.initState();
-    _animationController = AnimationController(
-      duration: const Duration(milliseconds: 2000),
+
+    _entrance = AnimationController(
       vsync: this,
+      duration: const Duration(milliseconds: 1400),
+    );
+    _spin = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 14),
+    )..repeat();
+
+    _logoScale = CurvedAnimation(
+      parent: _entrance,
+      curve: const Interval(0.0, 0.6, curve: Curves.easeOutBack),
+    );
+    _fade = CurvedAnimation(
+      parent: _entrance,
+      curve: const Interval(0.3, 1.0, curve: Curves.easeOut),
+    );
+    _titleSlide = Tween<Offset>(
+      begin: const Offset(0, 0.4),
+      end: Offset.zero,
+    ).animate(
+      CurvedAnimation(
+        parent: _entrance,
+        curve: const Interval(0.35, 1.0, curve: Curves.easeOutCubic),
+      ),
     );
 
-    _animationController.forward();
+    _entrance.forward();
 
-    // Check authentication and navigate accordingly
-    Future.delayed(const Duration(milliseconds: 2500), () async {
+    Future.delayed(const Duration(milliseconds: 2400), () {
       if (mounted) {
-        final user = FirebaseAuth.instance.currentUser;
-        if (user != null) {
-          // User is logged in, go to home
-          Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (_) => const HomeScreen()),
-          );
-        } else {
-          // User is not logged in, go to login
-          Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (_) => const LoginScreen()),
-          );
-        }
+        Navigator.of(context).pushReplacementNamed('/auth');
       }
     });
   }
 
   @override
   void dispose() {
-    _animationController.dispose();
+    _entrance.dispose();
+    _spin.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              Color(0xFFB20000), // Deep red
-              Color(0xFFD32F2F), // Lighter red
-            ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
+      backgroundColor: AppColors.beige,
+      body: Stack(
+        children: [
+          _buildBackdrop(),
+          Center(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 32),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ScaleTransition(
+                    scale: _logoScale,
+                    child: _buildLogo(),
+                  ),
+                  const SizedBox(height: 32),
+                  SlideTransition(
+                    position: _titleSlide,
+                    child: FadeTransition(
+                      opacity: _fade,
+                      child: Column(
+                        children: [
+                          Text(
+                            'Directions',
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.playfairDisplay(
+                              fontSize: 44,
+                              fontWeight: FontWeight.w800,
+                              color: AppColors.crimson,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            'Find the career that finds you',
+                            style: GoogleFonts.inter(
+                              fontSize: 14,
+                              color: AppColors.inkSoft,
+                              letterSpacing: 1.6,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 56),
+                  FadeTransition(
+                    opacity: _fade,
+                    child: const SizedBox(
+                      width: 28,
+                      height: 28,
+                      child: CircularProgressIndicator(
+                        color: AppColors.crimson,
+                        strokeWidth: 2.5,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBackdrop() {
+    return Stack(
+      children: [
+        Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [AppColors.beige, AppColors.beigeWarm],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+            ),
           ),
         ),
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+        Positioned(
+          top: -120,
+          right: -100,
+          child: _glow(280, AppColors.crimson.withValues(alpha: 0.10)),
+        ),
+        Positioned(
+          bottom: -140,
+          left: -120,
+          child: _glow(320, AppColors.crimson.withValues(alpha: 0.08)),
+        ),
+      ],
+    );
+  }
+
+  Widget _glow(double size, Color color) {
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        gradient: RadialGradient(
+          colors: [color, color.withValues(alpha: 0)],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLogo() {
+    return AnimatedBuilder(
+      animation: _spin,
+      builder: (context, _) {
+        return SizedBox(
+          width: 140,
+          height: 140,
+          child: Stack(
+            alignment: Alignment.center,
             children: [
-              // Animated Icon
-              FadeTransition(
-                opacity: _animationController,
+              Transform.rotate(
+                angle: _spin.value * 2 * math.pi,
                 child: Container(
-                  padding: EdgeInsets.all(32),
+                  width: 140,
+                  height: 140,
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
                     shape: BoxShape.circle,
-                  ),
-                  child: Icon(
-                    Icons.explore_rounded,
-                    size: 80,
-                    color: Colors.white,
+                    border: Border.all(
+                      color: AppColors.crimson.withValues(alpha: 0.25),
+                      width: 1.2,
+                    ),
                   ),
                 ),
               ),
-              const SizedBox(height: 40),
-              // App Name
-              ScaleTransition(
-                scale: _animationController,
-                child: Column(
-                  children: [
-                    Text(
-                      'DIRECTIONS',
-                      style: TextStyle(
-                        fontSize: 42,
-                        color: Colors.white,
-                        fontWeight: FontWeight.w900,
-                        letterSpacing: 3.0,
-                      ),
+              Transform.rotate(
+                angle: -_spin.value * 2 * math.pi,
+                child: Container(
+                  width: 110,
+                  height: 110,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: AppColors.crimson.withValues(alpha: 0.4),
+                      width: 1,
                     ),
-                    SizedBox(height: 12),
-                    Text(
-                      'Find Your Path',
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Color(0xFFFFFEF0),
-                        fontWeight: FontWeight.w400,
-                        letterSpacing: 1.5,
-                      ),
+                  ),
+                ),
+              ),
+              Container(
+                width: 86,
+                height: 86,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: AppColors.crimsonGradient,
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.crimson.withValues(alpha: 0.35),
+                      blurRadius: 26,
+                      spreadRadius: 2,
                     ),
                   ],
                 ),
-              ),
-              const SizedBox(height: 40),
-              // Loading Indicator
-              SizedBox(
-                width: 40,
-                height: 40,
-                child: CircularProgressIndicator(
-                  color: Color(0xFFFFFEF0),
-                  strokeWidth: 3,
+                child: const Icon(
+                  Icons.explore_rounded,
+                  color: Colors.white,
+                  size: 46,
                 ),
               ),
             ],
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }

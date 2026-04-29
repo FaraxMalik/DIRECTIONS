@@ -1,13 +1,35 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:provider/provider.dart';
-import 'dart:ui';
+import 'package:google_fonts/google_fonts.dart';
+
+import '../theme/app_theme.dart';
+import 'career_counselor_screen.dart';
+import 'dashboard_screen.dart';
+import 'journaling_screen.dart';
+import 'profile_screen.dart';
 import 'quiz_screen.dart';
 import 'results_screen.dart';
-import 'profile_screen.dart';
-import 'journaling_screen.dart';
-import 'login_screen.dart';
-import '../services/profile_service.dart';
+
+/// Tabs in the bottom nav.
+enum HomeTab { home, quiz, counselor, journal, results, profile }
+
+/// Provides a way for any descendant to switch the currently selected
+/// home tab. Exposes [HomeNavigation.of].
+class HomeNavigation extends InheritedWidget {
+  final void Function(HomeTab tab) goTo;
+
+  const HomeNavigation({
+    super.key,
+    required this.goTo,
+    required super.child,
+  });
+
+  static HomeNavigation? of(BuildContext context) {
+    return context.dependOnInheritedWidgetOfExactType<HomeNavigation>();
+  }
+
+  @override
+  bool updateShouldNotify(HomeNavigation oldWidget) => false;
+}
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -16,243 +38,208 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
-  @override
-  void initState() {
-    super.initState();
-    // Load profile data when home screen loads
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final profileService = Provider.of<ProfileService>(context, listen: false);
-      profileService.load();
-    });
-  }
+class _HomeScreenState extends State<HomeScreen>
+    with SingleTickerProviderStateMixin {
+  HomeTab _selected = HomeTab.home;
+  late final AnimationController _pulse;
 
-  void _logout() async {
-    await FirebaseAuth.instance.signOut();
-    if (mounted) {
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => const LoginScreen()),
-      );
+  static const _items = <_NavItemData>[
+    _NavItemData(HomeTab.home, Icons.home_rounded, 'Home'),
+    _NavItemData(HomeTab.quiz, Icons.quiz_rounded, 'Quiz'),
+    _NavItemData(HomeTab.counselor, Icons.auto_awesome_rounded, 'Counselor'),
+    _NavItemData(HomeTab.journal, Icons.menu_book_rounded, 'Journal'),
+    _NavItemData(HomeTab.results, Icons.emoji_events_rounded, 'Results'),
+    _NavItemData(HomeTab.profile, Icons.person_rounded, 'Profile'),
+  ];
+
+  Widget _screenFor(HomeTab tab) {
+    switch (tab) {
+      case HomeTab.home:
+        return const DashboardScreen();
+      case HomeTab.quiz:
+        return const QuizScreen();
+      case HomeTab.counselor:
+        return const CareerCounselorScreen();
+      case HomeTab.journal:
+        return const JournalingScreen();
+      case HomeTab.results:
+        return const ResultsScreen();
+      case HomeTab.profile:
+        return const ProfileScreen();
     }
   }
 
   @override
-  Widget build(BuildContext context) {
-    final user = FirebaseAuth.instance.currentUser;
-    final profileService = Provider.of<ProfileService>(context);
-    final userName = profileService.profile?.displayName ?? user?.email?.split('@')[0] ?? 'User';
+  void initState() {
+    super.initState();
+    _pulse = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 2),
+    )..repeat(reverse: true);
+  }
 
+  @override
+  void dispose() {
+    _pulse.dispose();
+    super.dispose();
+  }
+
+  void _go(HomeTab tab) {
+    if (_selected == tab) return;
+    setState(() => _selected = tab);
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              Color(0xFFB20000), // Deep red
-              Color(0xFFD32F2F), // Lighter red
-            ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
+      extendBody: true,
+      backgroundColor: AppColors.beige,
+      body: HomeNavigation(
+        goTo: _go,
+        child: AnimatedSwitcher(
+          duration: const Duration(milliseconds: 280),
+          switchInCurve: Curves.easeOut,
+          switchOutCurve: Curves.easeIn,
+          child: KeyedSubtree(
+            key: ValueKey(_selected),
+            child: _screenFor(_selected),
           ),
         ),
-        child: SafeArea(
-          child: Column(
-            children: [
-              // Header with App Name
-              Padding(
-                padding: const EdgeInsets.all(24.0),
-                child: Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'DIRECTIONS',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 32,
-                                fontWeight: FontWeight.w800,
-                                letterSpacing: 2.0,
-                              ),
-                            ),
-                            SizedBox(height: 8),
-                            Text(
-                              'Find Your Path',
-                              style: TextStyle(
-                                color: Color(0xFFFFFEF0),
-                                fontSize: 14,
-                                fontWeight: FontWeight.w400,
-                                letterSpacing: 1.0,
-                              ),
-                            ),
-                          ],
-                        ),
-                        Container(
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.2),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: IconButton(
-                            icon: Icon(Icons.logout_rounded, color: Colors.white),
-                            onPressed: _logout,
-                            tooltip: 'Logout',
-                          ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 20),
-                    Container(
-                      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.15),
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(
-                          color: Color(0xFFFFFEF0).withOpacity(0.3),
-                          width: 1,
-                        ),
-                      ),
-                      child: Row(
-                        children: [
-                          Icon(Icons.waving_hand_rounded, color: Color(0xFFFFFEF0), size: 20),
-                          SizedBox(width: 12),
-                          Text(
-                            'Welcome back, $userName',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              
-              // Cards
-              Expanded(
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Color(0xFFFFFEF0), // Light beige background
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(32),
-                      topRight: Radius.circular(32),
-                    ),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(24.0),
-                    child: GridView.count(
-                      crossAxisCount: 2,
-                      mainAxisSpacing: 16,
-                      crossAxisSpacing: 16,
-                      children: [
-                        _buildOptionCard(
-                          context,
-                          'Take Quiz',
-                          Icons.lightbulb_rounded,
-                          Color(0xFFB20000),
-                          Color(0xFFD32F2F),
-                        ),
-                        _buildOptionCard(
-                          context,
-                          'Results',
-                          Icons.auto_graph_rounded,
-                          Color(0xFF8B4513),
-                          Color(0xFFA0522D),
-                        ),
-                        _buildOptionCard(
-                          context,
-                          'Profile',
-                          Icons.account_circle_rounded,
-                          Color(0xFFB20000),
-                          Color(0xFFD32F2F),
-                        ),
-                        _buildOptionCard(
-                          context,
-                          'Journal',
-                          Icons.menu_book_rounded,
-                          Color(0xFF8B4513),
-                          Color(0xFFA0522D),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
+      ),
+      bottomNavigationBar: _buildBottomBar(),
+    );
+  }
+
+  Widget _buildBottomBar() {
+    return SafeArea(
+      top: false,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+        child: Container(
+          height: 70,
+          decoration: BoxDecoration(
+            color: AppColors.surface,
+            borderRadius: BorderRadius.circular(AppRadii.xl),
+            border:
+                Border.all(color: AppColors.crimson.withValues(alpha: 0.10)),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.crimson.withValues(alpha: 0.10),
+                blurRadius: 24,
+                offset: const Offset(0, 10),
               ),
             ],
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: _items.map((it) {
+              if (it.tab == HomeTab.counselor) {
+                return _buildCounselorBtn(it);
+              }
+              return _buildItem(it);
+            }).toList(),
           ),
         ),
       ),
     );
   }
 
-  Widget _buildOptionCard(
-    BuildContext context,
-    String title,
-    IconData icon,
-    Color startColor,
-    Color endColor,
-  ) {
-    return GestureDetector(
-      onTap: () {
-        if (title == 'Take Quiz') {
-          Navigator.push(context, MaterialPageRoute(builder: (_) => const QuizScreen()));
-        } else if (title == 'Results') {
-          Navigator.push(context, MaterialPageRoute(builder: (_) => const ResultsScreen()));
-        } else if (title == 'Profile') {
-          Navigator.push(context, MaterialPageRoute(builder: (_) => const ProfileScreen()));
-        } else if (title == 'Journal') {
-          Navigator.push(context, MaterialPageRoute(builder: (_) => const JournalingScreen()));
-        }
-      },
-      child: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [startColor, endColor],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-          borderRadius: BorderRadius.circular(24),
-          boxShadow: [
-            BoxShadow(
-              color: startColor.withOpacity(0.3),
-              blurRadius: 12,
-              offset: Offset(0, 6),
-            ),
-          ],
-        ),
+  Widget _buildItem(_NavItemData data) {
+    final selected = _selected == data.tab;
+    return Expanded(
+      child: InkWell(
+        borderRadius: BorderRadius.circular(AppRadii.lg),
+        onTap: () => _go(data.tab),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Container(
-              padding: EdgeInsets.all(16),
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 220),
+              padding: EdgeInsets.symmetric(
+                horizontal: selected ? 12 : 0,
+                vertical: selected ? 6 : 0,
+              ),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.2),
-                shape: BoxShape.circle,
+                color: selected
+                    ? AppColors.crimson.withValues(alpha: 0.10)
+                    : Colors.transparent,
+                borderRadius: BorderRadius.circular(AppRadii.pill),
               ),
               child: Icon(
-                icon,
-                size: 48,
-                color: Colors.white,
+                data.icon,
+                color: selected ? AppColors.crimson : AppColors.inkMuted,
+                size: 22,
               ),
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 4),
             Text(
-              title,
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                letterSpacing: 0.5,
+              data.label,
+              style: GoogleFonts.inter(
+                fontSize: 10,
+                color: selected ? AppColors.crimson : AppColors.inkMuted,
+                fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
               ),
-              textAlign: TextAlign.center,
             ),
           ],
         ),
       ),
     );
   }
+
+  Widget _buildCounselorBtn(_NavItemData data) {
+    final selected = _selected == data.tab;
+    return Expanded(
+      child: InkWell(
+        borderRadius: BorderRadius.circular(AppRadii.lg),
+        onTap: () => _go(data.tab),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            AnimatedBuilder(
+              animation: _pulse,
+              builder: (context, _) {
+                final glow = selected ? 0.55 : 0.30 + 0.25 * _pulse.value;
+                return Container(
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: AppColors.crimsonGradient,
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.crimson.withValues(alpha: glow),
+                        blurRadius: 16,
+                        spreadRadius: 1,
+                      ),
+                    ],
+                    border: selected
+                        ? Border.all(color: AppColors.cream, width: 2)
+                        : null,
+                  ),
+                  child: const Icon(Icons.auto_awesome_rounded,
+                      color: Colors.white, size: 22),
+                );
+              },
+            ),
+            const SizedBox(height: 4),
+            Text(
+              'Faraz',
+              style: GoogleFonts.inter(
+                fontSize: 10,
+                color: selected ? AppColors.crimson : AppColors.inkMuted,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _NavItemData {
+  final HomeTab tab;
+  final IconData icon;
+  final String label;
+  const _NavItemData(this.tab, this.icon, this.label);
 }

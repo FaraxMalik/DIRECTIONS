@@ -1,47 +1,58 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+
 import '../models/personality_question.dart';
 import '../models/personality_results.dart';
+import '../services/gemini_service.dart';
 import '../services/personality_scoring_service.dart';
 import '../services/personality_service.dart';
+import '../theme/app_theme.dart';
 import 'personality_results_screen.dart';
 
 class PersonalityQuizScreen extends StatefulWidget {
-  const PersonalityQuizScreen({super.key});
+  /// 'bigfive' | 'jungian' | null (both)
+  final String? testType;
+  const PersonalityQuizScreen({super.key, this.testType});
 
   @override
   State<PersonalityQuizScreen> createState() => _PersonalityQuizScreenState();
 }
 
 class _PersonalityQuizScreenState extends State<PersonalityQuizScreen> {
-  // Quiz state
   bool _isLoading = true;
-  bool _isBigFivePhase = true; // Start with Big Five test
+  bool _isBigFivePhase = true;
   int _currentPage = 0;
-  
+
   List<PersonalityQuestion> _bigFiveQuestions = [];
   List<PersonalityQuestion> _jungianQuestions = [];
-  
-  Map<int, int> _bigFiveResponses = {};
-  Map<int, int> _jungianResponses = {};
-  
+
+  final Map<int, int> _bigFiveResponses = {};
+  final Map<int, int> _jungianResponses = {};
+
   final PersonalityService _personalityService = PersonalityService();
+
+  bool get _isSingleTest => widget.testType != null;
+  bool get _isBigFiveOnly => widget.testType == 'bigfive';
+  bool get _isJungianOnly => widget.testType == 'jungian';
 
   @override
   void initState() {
     super.initState();
+    _isBigFivePhase = !_isJungianOnly;
     _loadQuestions();
   }
 
   Future<void> _loadQuestions() async {
     try {
-      final bigFive = await PersonalityScoringService.loadIPIP50Questions();
-      final jungian = await PersonalityScoringService.loadJungianQuestions();
-      
-      setState(() {
-        _bigFiveQuestions = bigFive;
-        _jungianQuestions = jungian;
-        _isLoading = false;
-      });
+      if (!_isJungianOnly) {
+        _bigFiveQuestions =
+            await PersonalityScoringService.loadIPIP50Questions();
+      }
+      if (!_isBigFiveOnly) {
+        _jungianQuestions =
+            await PersonalityScoringService.loadJungianQuestions();
+      }
+      if (mounted) setState(() => _isLoading = false);
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -51,17 +62,13 @@ class _PersonalityQuizScreenState extends State<PersonalityQuizScreen> {
     }
   }
 
-  List<PersonalityQuestion> get _currentQuestions {
-    return _isBigFivePhase ? _bigFiveQuestions : _jungianQuestions;
-  }
+  List<PersonalityQuestion> get _currentQuestions =>
+      _isBigFivePhase ? _bigFiveQuestions : _jungianQuestions;
 
-  Map<int, int> get _currentResponses {
-    return _isBigFivePhase ? _bigFiveResponses : _jungianResponses;
-  }
+  Map<int, int> get _currentResponses =>
+      _isBigFivePhase ? _bigFiveResponses : _jungianResponses;
 
-  int get _totalPages {
-    return (_currentQuestions.length / 2).ceil();
-  }
+  int get _totalPages => (_currentQuestions.length / 2).ceil();
 
   List<PersonalityQuestion> get _currentPageQuestions {
     final startIdx = _currentPage * 2;
@@ -69,11 +76,8 @@ class _PersonalityQuizScreenState extends State<PersonalityQuizScreen> {
     return _currentQuestions.sublist(startIdx, endIdx);
   }
 
-  bool get _canProceed {
-    return _currentPageQuestions.every(
-      (q) => _currentResponses.containsKey(q.id)
-    );
-  }
+  bool get _canProceed =>
+      _currentPageQuestions.every((q) => _currentResponses.containsKey(q.id));
 
   void _setResponse(int questionId, int value) {
     setState(() {
@@ -89,15 +93,12 @@ class _PersonalityQuizScreenState extends State<PersonalityQuizScreen> {
     if (_currentPage < _totalPages - 1) {
       setState(() => _currentPage++);
     } else {
-      // End of current test
-      if (_isBigFivePhase) {
-        // Switch to Jungian test
+      if (_isBigFivePhase && !_isSingleTest) {
         setState(() {
           _isBigFivePhase = false;
           _currentPage = 0;
         });
       } else {
-        // Both tests complete - calculate and save results
         await _completeQuiz();
       }
     }
@@ -106,8 +107,7 @@ class _PersonalityQuizScreenState extends State<PersonalityQuizScreen> {
   void _previousPage() {
     if (_currentPage > 0) {
       setState(() => _currentPage--);
-    } else if (!_isBigFivePhase) {
-      // Go back to Big Five test
+    } else if (!_isBigFivePhase && !_isSingleTest) {
       setState(() {
         _isBigFivePhase = true;
         _currentPage = (_bigFiveQuestions.length / 2).ceil() - 1;
@@ -117,40 +117,63 @@ class _PersonalityQuizScreenState extends State<PersonalityQuizScreen> {
 
   Future<void> _completeQuiz() async {
     try {
-      // Calculate scores
-      final bigFiveScores = PersonalityScoringService.calculateBigFiveScores(
+      PersonalityResults? existingResults;
+      if (_isSingleTest) {
+        existingResults = await _personalityService.getPersonalityResults();
+      }
+
+      final aiResults = await GeminiService().inferPersonalityFromAnswers(
+        bigFiveQuestions: _bigFiveQuestions,
+        bigFiveResponses: _bigFiveResponses,
+        jungianQuestions: _jungianQuestions,
+        jungianResponses: _jungianResponses,
+      );
+
+      final localBigFive = PersonalityScoringService.calculateBigFiveScores(
         _bigFiveQuestions,
         _bigFiveResponses,
       );
-      
-      final jungianType = PersonalityScoringService.calculateJungianType(
+      final localType = PersonalityScoringService.calculateJungianType(
         _jungianQuestions,
         _jungianResponses,
       );
 
-      final results = PersonalityResults(
-        mbtiLikeType: jungianType,
-        bigFive: bigFiveScores,
-        timestamp: DateTime.now(),
-      );
-
-      // Save to Firestore
-      await _personalityService.savePersonalityResults(results);
-
-      // Navigate to results screen
-      if (mounted) {
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(
-            builder: (context) => PersonalityResultsScreen(results: results),
-          ),
+      PersonalityResults finalResults;
+      if (_isBigFiveOnly && existingResults != null) {
+        finalResults = PersonalityResults(
+          mbtiLikeType:
+              aiResults?.mbtiLikeType ?? existingResults.mbtiLikeType,
+          bigFive: aiResults?.bigFive ?? localBigFive,
+          timestamp: DateTime.now(),
+        );
+      } else if (_isJungianOnly && existingResults != null) {
+        finalResults = PersonalityResults(
+          mbtiLikeType: aiResults?.mbtiLikeType ?? localType,
+          bigFive: aiResults?.bigFive ?? existingResults.bigFive,
+          timestamp: DateTime.now(),
+        );
+      } else {
+        finalResults = PersonalityResults(
+          mbtiLikeType: aiResults?.mbtiLikeType ?? localType,
+          bigFive: aiResults?.bigFive ?? localBigFive,
+          timestamp: DateTime.now(),
         );
       }
+
+      await _personalityService.savePersonalityResults(finalResults);
+
+      if (!mounted) return;
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(
+          builder: (_) => PersonalityResultsScreen(results: finalResults),
+        ),
+      );
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Error saving results: $e'),
-            backgroundColor: Colors.red,
+            backgroundColor: AppColors.danger,
           ),
         );
       }
@@ -161,143 +184,142 @@ class _PersonalityQuizScreenState extends State<PersonalityQuizScreen> {
   Widget build(BuildContext context) {
     if (_isLoading) {
       return const Scaffold(
-        backgroundColor: Color(0xFFFFFEF0),
-        body: Center(child: CircularProgressIndicator()),
+        backgroundColor: AppColors.beige,
+        body: Center(
+          child: CircularProgressIndicator(color: AppColors.crimson),
+        ),
       );
     }
 
     final progress = (_currentPage + 1) / _totalPages;
+    final isMbti = !_isBigFivePhase;
+    final title = isMbti ? 'MBTI · Jungian 16-type' : 'OCEAN · Big Five';
 
     return Scaffold(
-      backgroundColor: const Color(0xFFFFFEF0),
+      backgroundColor: AppColors.beige,
       appBar: AppBar(
-        title: Text(_isBigFivePhase ? 'Big Five Test' : 'Jungian 16-Type Test'),
-        backgroundColor: const Color(0xFFB20000),
-        foregroundColor: Colors.white,
-        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_rounded, color: AppColors.ink),
+          onPressed: () => Navigator.maybePop(context),
+        ),
+        title: Text(
+          title,
+          style: GoogleFonts.playfairDisplay(
+            fontSize: 18,
+            fontWeight: FontWeight.w700,
+            color: AppColors.ink,
+          ),
+        ),
       ),
       body: Column(
         children: [
-          // Progress section
-          Container(
-            color: const Color(0xFFB20000),
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Page ${_currentPage + 1} of $_totalPages',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    Text(
-                      '${(progress * 100).toInt()}%',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(10),
-                  child: LinearProgressIndicator(
-                    value: progress,
-                    backgroundColor: Colors.white.withOpacity(0.3),
-                    valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
-                    minHeight: 8,
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          // Questions section
+          _buildProgressHeader(progress),
           Expanded(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: _currentPageQuestions.asMap().entries.map((entry) {
                   final question = entry.value;
-                  final questionNumber = _currentPage * 2 + entry.key + 1;
-                  
+                  final qNum = _currentPage * 2 + entry.key + 1;
                   return Padding(
-                    padding: const EdgeInsets.only(bottom: 32),
-                    child: _buildQuestionCard(question, questionNumber),
+                    padding: const EdgeInsets.only(bottom: 18),
+                    child: _buildQuestionCard(question, qNum),
                   );
                 }).toList(),
               ),
             ),
           ),
+          _buildBottomBar(),
+        ],
+      ),
+    );
+  }
 
-          // Navigation buttons
-          Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
-                  blurRadius: 10,
-                  offset: const Offset(0, -2),
+  Widget _buildProgressHeader(double progress) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 4, 20, 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Page ${_currentPage + 1} of $_totalPages',
+                style: GoogleFonts.inter(
+                  color: AppColors.inkMuted,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
                 ),
-              ],
-            ),
-            child: Row(
-              children: [
-                if (_currentPage > 0 || !_isBigFivePhase)
-                  Expanded(
-                    child: OutlinedButton(
-                      onPressed: _previousPage,
-                      style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        side: const BorderSide(color: Color(0xFFB20000)),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                      child: const Text(
-                        'Previous',
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Color(0xFFB20000),
-                        ),
-                      ),
-                    ),
-                  ),
-                if (_currentPage > 0 || !_isBigFivePhase) const SizedBox(width: 12),
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: _canProceed ? _nextPage : null,
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      backgroundColor: const Color(0xFFB20000),
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      disabledBackgroundColor: Colors.grey[300],
-                    ),
-                    child: Text(
-                      _currentPage < _totalPages - 1 
-                          ? 'Next' 
-                          : (_isBigFivePhase ? 'Continue to Part 2' : 'Finish'),
-                      style: const TextStyle(fontSize: 16),
-                    ),
-                  ),
+              ),
+              Text(
+                '${(progress * 100).toInt()}%',
+                style: GoogleFonts.inter(
+                  color: AppColors.crimson,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
                 ),
-              ],
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(AppRadii.pill),
+            child: TweenAnimationBuilder<double>(
+              tween: Tween(begin: 0, end: progress),
+              duration: const Duration(milliseconds: 350),
+              curve: Curves.easeOut,
+              builder: (context, value, _) => LinearProgressIndicator(
+                value: value,
+                minHeight: 7,
+                backgroundColor: AppColors.beigeDeep,
+                valueColor:
+                    const AlwaysStoppedAnimation<Color>(AppColors.crimson),
+              ),
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildBottomBar() {
+    return SafeArea(
+      top: false,
+      child: Container(
+        padding: const EdgeInsets.fromLTRB(20, 12, 20, 16),
+        decoration: const BoxDecoration(
+          color: AppColors.beige,
+          border:
+              Border(top: BorderSide(color: AppColors.beigeDeep, width: 1)),
+        ),
+        child: Row(
+          children: [
+            if (_currentPage > 0 || !_isBigFivePhase)
+              Expanded(
+                child: OutlinedButton(
+                  onPressed: _previousPage,
+                  child: const Text('Previous'),
+                ),
+              ),
+            if (_currentPage > 0 || !_isBigFivePhase)
+              const SizedBox(width: 12),
+            Expanded(
+              flex: 2,
+              child: ElevatedButton(
+                onPressed: _canProceed ? _nextPage : null,
+                child: Text(
+                  _currentPage < _totalPages - 1
+                      ? 'Next'
+                      : (_isBigFivePhase && !_isSingleTest
+                          ? 'Continue to MBTI'
+                          : 'Finish'),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -306,40 +328,32 @@ class _PersonalityQuizScreenState extends State<PersonalityQuizScreen> {
     final currentAnswer = _currentResponses[question.id];
 
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(AppRadii.lg),
+        border: Border.all(color: AppColors.crimson.withValues(alpha: 0.10)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Question number and text
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
-                width: 32,
-                height: 32,
+                width: 30,
+                height: 30,
                 decoration: BoxDecoration(
-                  color: const Color(0xFFB20000).withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(8),
+                  color: AppColors.crimson.withValues(alpha: 0.10),
+                  borderRadius: BorderRadius.circular(AppRadii.sm),
                 ),
-                child: Center(
-                  child: Text(
-                    '$questionNumber',
-                    style: const TextStyle(
-                      color: Color(0xFFB20000),
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                    ),
+                alignment: Alignment.center,
+                child: Text(
+                  '$questionNumber',
+                  style: GoogleFonts.inter(
+                    color: AppColors.crimson,
+                    fontWeight: FontWeight.w800,
+                    fontSize: 13,
                   ),
                 ),
               ),
@@ -347,100 +361,73 @@ class _PersonalityQuizScreenState extends State<PersonalityQuizScreen> {
               Expanded(
                 child: Text(
                   question.text,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.black87,
-                    height: 1.4,
+                  style: GoogleFonts.inter(
+                    fontSize: 15.5,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.ink,
+                    height: 1.45,
                   ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 20),
-
-          // Likert scale options
-          Column(
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: const [
-                  Expanded(
-                    child: Text(
-                      'Strongly\nDisagree',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: 11, color: Colors.grey),
-                    ),
-                  ),
-                  Expanded(
-                    child: Text(
-                      'Disagree',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: 11, color: Colors.grey),
-                    ),
-                  ),
-                  Expanded(
-                    child: Text(
-                      'Neutral',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: 11, color: Colors.grey),
-                    ),
-                  ),
-                  Expanded(
-                    child: Text(
-                      'Agree',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: 11, color: Colors.grey),
-                    ),
-                  ),
-                  Expanded(
-                    child: Text(
-                      'Strongly\nAgree',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: 11, color: Colors.grey),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: List.generate(5, (index) {
-                  final value = index + 1;
-                  final isSelected = currentAnswer == value;
-                  
-                  return GestureDetector(
-                    onTap: () => _setResponse(question.id, value),
-                    child: Container(
-                      width: 50,
-                      height: 50,
-                      decoration: BoxDecoration(
-                        color: isSelected 
-                            ? const Color(0xFFB20000) 
-                            : Colors.white,
-                        border: Border.all(
-                          color: isSelected 
-                              ? const Color(0xFFB20000) 
-                              : Colors.grey[300]!,
-                          width: 2,
-                        ),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Center(
-                        child: Text(
-                          '$value',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: isSelected ? Colors.white : Colors.grey[600],
-                          ),
-                        ),
-                      ),
-                    ),
-                  );
-                }),
-              ),
+          const SizedBox(height: 18),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: const [
+              _LikertLabel('Strongly\nDisagree'),
+              _LikertLabel('Disagree'),
+              _LikertLabel('Neutral'),
+              _LikertLabel('Agree'),
+              _LikertLabel('Strongly\nAgree'),
             ],
+          ),
+          const SizedBox(height: 8),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: List.generate(5, (i) {
+              final value = i + 1;
+              final isSelected = currentAnswer == value;
+              return GestureDetector(
+                onTap: () => _setResponse(question.id, value),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 180),
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    color: isSelected
+                        ? AppColors.crimson
+                        : AppColors.beige,
+                    border: Border.all(
+                      color: isSelected
+                          ? AppColors.crimson
+                          : AppColors.crimson.withValues(alpha: 0.18),
+                      width: 1.6,
+                    ),
+                    borderRadius: BorderRadius.circular(AppRadii.md),
+                    boxShadow: isSelected
+                        ? [
+                            BoxShadow(
+                              color: AppColors.crimson.withValues(alpha: 0.32),
+                              blurRadius: 12,
+                              offset: const Offset(0, 4),
+                            ),
+                          ]
+                        : null,
+                  ),
+                  alignment: Alignment.center,
+                  child: Text(
+                    '$value',
+                    style: GoogleFonts.inter(
+                      fontSize: 17,
+                      fontWeight: FontWeight.w700,
+                      color:
+                          isSelected ? Colors.white : AppColors.inkMuted,
+                    ),
+                  ),
+                ),
+              );
+            }),
           ),
         ],
       ),
@@ -448,3 +435,22 @@ class _PersonalityQuizScreenState extends State<PersonalityQuizScreen> {
   }
 }
 
+class _LikertLabel extends StatelessWidget {
+  final String text;
+  const _LikertLabel(this.text);
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: Text(
+        text,
+        textAlign: TextAlign.center,
+        style: GoogleFonts.inter(
+          fontSize: 10,
+          color: AppColors.inkMuted,
+          height: 1.2,
+        ),
+      ),
+    );
+  }
+}

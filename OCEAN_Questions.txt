@@ -1,0 +1,273 @@
+BIG FIVE (OCEAN) PERSONALITY TEST QUESTIONS
+==========================================
+
+This test measures the five major dimensions of personality:
+- Openness to Experience (O)
+- Conscientiousness (C)
+- Extraversion (E)
+- Agreeableness (A)
+- Neuroticism (N)
+
+Instructions: For each question, choose how much you agree or disagree on a scale of 1-5:
+1 = Strongly Disagree
+2 = Disagree
+3 = Neutral
+4 = Agree
+5 = Strongly Agree
+
+==========================================
+
+QUESTION 1
+I am the life of the party.
+Dimension: Extraversion
+Scale: 1-5 (Strongly Disagree to Strongly Agree)
+
+QUESTION 2
+I feel little concern for others.
+Dimension: Agreeableness - Reverse scored
+Scale: 1-5 (Strongly Disagree to Strongly Agree)
+
+QUESTION 3
+I am always prepared.
+Dimension: Conscientiousness
+Scale: 1-5 (Strongly Disagree to Strongly Agree)
+
+QUESTION 4
+I get stressed out easily.
+Dimension: Neuroticism
+Scale: 1-5 (Strongly Disagree to Strongly Agree)
+
+QUESTION 5
+I have a rich vocabulary.
+Dimension: Openness
+Scale: 1-5 (Strongly Disagree to Strongly Agree)
+
+QUESTION 6
+I don't talk a lot.
+Dimension: Extraversion - Reverse scored
+Scale: 1-5 (Strongly Disagree to Strongly Agree)
+
+QUESTION 7
+I am interested in people.
+Dimension: Agreeableness
+Scale: 1-5 (Strongly Disagree to Strongly Agree)
+
+QUESTION 8
+I leave my belongings around.
+Dimension: Conscientiousness - Reverse scored
+Scale: 1-5 (Strongly Disagree to Strongly Agree)
+
+QUESTION 9
+I am relaxed most of the time.
+Dimension: Neuroticism - Reverse scored
+Scale: 1-5 (Strongly Disagree to Strongly Agree)
+
+QUESTION 10
+I have difficulty understanding abstract ideas.
+Dimension: Openness - Reverse scored
+Scale: 1-5 (Strongly Disagree to Strongly Agree)
+
+QUESTION 11
+I feel comfortable around people.
+Dimension: Extraversion
+Scale: 1-5 (Strongly Disagree to Strongly Agree)
+
+QUESTION 12
+I insult people.
+Dimension: Agreeableness - Reverse scored
+Scale: 1-5 (Strongly Disagree to Strongly Agree)
+
+QUESTION 13
+I pay attention to details.
+Dimension: Conscientiousness
+Scale: 1-5 (Strongly Disagree to Strongly Agree)
+
+QUESTION 14
+I worry about things.
+Dimension: Neuroticism
+Scale: 1-5 (Strongly Disagree to Strongly Agree)
+
+QUESTION 15
+I have a vivid imagination.
+Dimension: Openness
+Scale: 1-5 (Strongly Disagree to Strongly Agree)
+
+QUESTION 16
+I keep in the background.
+Dimension: Extraversion - Reverse scored
+Scale: 1-5 (Strongly Disagree to Strongly Agree)
+
+QUESTION 17
+I sympathize with others' feelings.
+Dimension: Agreeableness
+Scale: 1-5 (Strongly Disagree to Strongly Agree)
+
+QUESTION 18
+I make a mess of things.
+Dimension: Conscientiousness - Reverse scored
+Scale: 1-5 (Strongly Disagree to Strongly Agree)
+
+QUESTION 19
+I seldom feel blue.
+Dimension: Neuroticism - Reverse scored
+Scale: 1-5 (Strongly Disagree to Strongly Agree)
+
+QUESTION 20
+I am not interested in abstract ideas.
+Dimension: Openness - Reverse scored
+Scale: 1-5 (Strongly Disagree to Strongly Agree)
+
+QUESTION 21
+I start conversations.
+Dimension: Extraversion
+Scale: 1-5 (Strongly Disagree to Strongly Agree)
+
+QUESTION 22
+I am not interested in other people's problems.
+Dimension: Agreeableness - Reverse scored
+Scale: 1-5 (Strongly Disagree to Strongly Agree)
+
+QUESTION 23
+I get chores done right away.
+Dimension: Conscientiousness
+Scale: 1-5 (Strongly Disagree to Strongly Agree)
+
+QUESTION 24
+I am easily disturbed.
+Dimension: Neuroticism
+Scale: 1-5 (Strongly Disagree to Strongly Agree)
+
+QUESTION 25
+I have excellent ideas.
+Dimension: Openness
+Scale: 1-5 (Strongly Disagree to Strongly Agree)
+
+QUESTION 26
+I have little to say.
+Dimension: Extraversion - Reverse scored
+Scale: 1-5 (Strongly Disagree to Strongly Agree)
+
+QUESTION 27
+I have a soft heart.
+Dimension: Agreeableness
+Scale: 1-5 (Strongly Disagree to Strongly Agree)
+
+QUESTION 28
+I often forget to put things back in their proper place.
+Dimension: Conscientiousness - Reverse scored
+Scale: 1-5 (Strongly Disagree to Strongly Agree)
+
+QUESTION 29
+I get upset easily.
+Dimension: Neuroticism
+Scale: 1-5 (Strongly Disagree to Strongly Agree)
+
+QUESTION 30
+I do not have a good imagination.
+Dimension: Openness - Reverse scored
+Scale: 1-5 (Strongly Disagree to Strongly Agree)
+
+QUESTION 31
+I talk to a lot of different people at parties.
+Dimension: Extraversion
+Scale: 1-5 (Strongly Disagree to Strongly Agree)
+
+QUESTION 32
+I am not really interested in others.
+Dimension: Agreeableness - Reverse scored
+Scale: 1-5 (Strongly Disagree to Strongly Agree)
+
+QUESTION 33
+I like order.
+Dimension: Conscientiousness
+Scale: 1-5 (Strongly Disagree to Strongly Agree)
+
+QUESTION 34
+I change my mood a lot.
+Dimension: Neuroticism
+Scale: 1-5 (Strongly Disagree to Strongly Agree)
+
+QUESTION 35
+I am quick to understand things.
+Dimension: Openness
+Scale: 1-5 (Strongly Disagree to Strongly Agree)
+
+QUESTION 36
+I don't like to draw attention to myself.
+Dimension: Extraversion - Reverse scored
+Scale: 1-5 (Strongly Disagree to Strongly Agree)
+
+QUESTION 37
+I take time out for others.
+Dimension: Agreeableness
+Scale: 1-5 (Strongly Disagree to Strongly Agree)
+
+QUESTION 38
+I shirk my duties.
+Dimension: Conscientiousness - Reverse scored
+Scale: 1-5 (Strongly Disagree to Strongly Agree)
+
+QUESTION 39
+I have frequent mood swings.
+Dimension: Neuroticism
+Scale: 1-5 (Strongly Disagree to Strongly Agree)
+
+QUESTION 40
+I use difficult words.
+Dimension: Openness
+Scale: 1-5 (Strongly Disagree to Strongly Agree)
+
+QUESTION 41
+I don't mind being the center of attention.
+Dimension: Extraversion
+Scale: 1-5 (Strongly Disagree to Strongly Agree)
+
+QUESTION 42
+I feel others' emotions.
+Dimension: Agreeableness
+Scale: 1-5 (Strongly Disagree to Strongly Agree)
+
+QUESTION 43
+I follow a schedule.
+Dimension: Conscientiousness
+Scale: 1-5 (Strongly Disagree to Strongly Agree)
+
+QUESTION 44
+I get irritated easily.
+Dimension: Neuroticism
+Scale: 1-5 (Strongly Disagree to Strongly Agree)
+
+QUESTION 45
+I spend time reflecting on things.
+Dimension: Openness
+Scale: 1-5 (Strongly Disagree to Strongly Agree)
+
+QUESTION 46
+I am quiet around strangers.
+Dimension: Extraversion - Reverse scored
+Scale: 1-5 (Strongly Disagree to Strongly Agree)
+
+QUESTION 47
+I make people feel at ease.
+Dimension: Agreeableness
+Scale: 1-5 (Strongly Disagree to Strongly Agree)
+
+QUESTION 48
+I am exacting in my work.
+Dimension: Conscientiousness
+Scale: 1-5 (Strongly Disagree to Strongly Agree)
+
+QUESTION 49
+I often feel blue.
+Dimension: Neuroticism
+Scale: 1-5 (Strongly Disagree to Strongly Agree)
+
+QUESTION 50
+I am full of ideas.
+Dimension: Openness
+Scale: 1-5 (Strongly Disagree to Strongly Agree)
+
+==========================================
+END OF BIG FIVE (OCEAN) TEST
+Total Questions: 50
+

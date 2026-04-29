@@ -1,0 +1,93 @@
+GENERIC CAREER QUIZ QUESTIONS
+=============================
+
+This is a general career assessment quiz that helps identify interests, motivations, and work preferences to suggest suitable career paths.
+
+Instructions: For each question, choose the option that best describes you or your preferences.
+
+==========================================
+
+QUESTION 1
+Imagine you just finished a detox period. What is the first thing you want to do?
+Options:
+A) Travel somewhere new
+B) Start a creative project
+C) Meet friends
+D) Read a book
+
+QUESTION 2
+Which MBTI type do you relate to most?
+Options:
+A) INTJ (Introverted, Intuitive, Thinking, Judging)
+B) ENFP (Extraverted, Intuitive, Feeling, Perceiving)
+C) ISTP (Introverted, Sensing, Thinking, Perceiving)
+D) ESFJ (Extraverted, Sensing, Feeling, Judging)
+
+QUESTION 3
+Which OCEAN personality trait is most dominant for you?
+Options:
+A) Openness (to experience)
+B) Conscientiousness
+C) Extraversion
+D) Agreeableness
+
+QUESTION 4
+You have a free day. What do you do?
+Options:
+A) Explore outdoors
+B) Learn something new
+C) Help someone
+D) Relax at home
+
+QUESTION 5
+Which activity excites you most?
+Options:
+A) Solving puzzles
+B) Leading a team
+C) Creating art
+D) Helping others
+
+QUESTION 6
+If you could master any skill instantly, what would it be?
+Options:
+A) Coding
+B) Public speaking
+C) Painting
+D) Negotiation
+
+QUESTION 7
+What motivates you most?
+Options:
+A) Achievement
+B) Connection
+C) Creativity
+D) Security
+
+QUESTION 8
+How do you handle stress?
+Options:
+A) Exercise
+B) Talk to friends
+C) Meditate
+D) Work harder
+
+QUESTION 9
+Which environment do you thrive in?
+Options:
+A) Fast-paced
+B) Collaborative
+C) Independent
+D) Structured
+
+QUESTION 10
+If you could do any job for a day, what would it be?
+Options:
+A) Entrepreneur
+B) Scientist
+C) Artist
+D) Teacher
+
+==========================================
+END OF GENERIC CAREER QUIZ
+Total Questions: 10
+

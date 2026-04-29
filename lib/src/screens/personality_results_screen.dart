@@ -1,175 +1,71 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+
 import '../models/personality_results.dart';
 import '../services/personality_scoring_service.dart';
+import '../theme/app_theme.dart';
 
 class PersonalityResultsScreen extends StatelessWidget {
   final PersonalityResults results;
 
-  const PersonalityResultsScreen({
-    super.key,
-    required this.results,
-  });
+  const PersonalityResultsScreen({super.key, required this.results});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFFFEF0),
+      backgroundColor: AppColors.beige,
       appBar: AppBar(
-        title: const Text('Your Personality Results'),
-        backgroundColor: const Color(0xFFB20000),
-        foregroundColor: Colors.white,
-        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_rounded, color: AppColors.ink),
+          onPressed: () => Navigator.maybePop(context),
+        ),
+        title: Text(
+          'Your results',
+          style: GoogleFonts.playfairDisplay(
+            color: AppColors.ink,
+            fontSize: 20,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
       ),
       body: SingleChildScrollView(
+        padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Success header
-            Container(
-              width: double.infinity,
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [Color(0xFFB20000), Color(0xFF8B0000)],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-              ),
-              padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 20),
-              child: Column(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.2),
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(
-                      Icons.psychology_rounded,
-                      size: 60,
-                      color: Colors.white,
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  const Text(
-                    'Analysis Complete!',
-                    style: TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  const Text(
-                    'Your personality results have been generated.',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.white,
-                    ),
-                  ),
-                ],
+            _buildHero(),
+            const SizedBox(height: 22),
+            _buildTypeCard(),
+            const SizedBox(height: 22),
+            Text(
+              'Big Five (OCEAN)',
+              style: GoogleFonts.playfairDisplay(
+                color: AppColors.ink,
+                fontSize: 22,
+                fontWeight: FontWeight.w700,
               ),
             ),
-
-            Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Jungian 16-type result
-                  _buildTypeCard(),
-                  const SizedBox(height: 24),
-
-                  // Big Five results
-                  const Text(
-                    'Big Five Personality Traits',
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFFB20000),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  _buildBigFiveCard('Openness', results.bigFive.openness),
-                  const SizedBox(height: 12),
-                  _buildBigFiveCard('Conscientiousness', results.bigFive.conscientiousness),
-                  const SizedBox(height: 12),
-                  _buildBigFiveCard('Extraversion', results.bigFive.extraversion),
-                  const SizedBox(height: 12),
-                  _buildBigFiveCard('Agreeableness', results.bigFive.agreeableness),
-                  const SizedBox(height: 12),
-                  _buildBigFiveCard('Neuroticism', results.bigFive.neuroticism),
-                  const SizedBox(height: 24),
-
-                  // Info message
-                  Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: Colors.blue[50],
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.blue[200]!),
-                    ),
-                    child: Row(
-                      children: [
-                        Icon(Icons.info_outline, color: Colors.blue[700]),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Text(
-                            'Career recommendations will be based on your personality insights.',
-                            style: TextStyle(
-                              color: Colors.blue[900],
-                              fontSize: 14,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Disclaimer
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: Colors.grey[100],
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Text(
-                      'This test uses open-source Jungian 16-type and IPIP-50 Big Five markers. It is not affiliated with The Myers-Briggs Company.',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey[700],
-                        fontStyle: FontStyle.italic,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-
-                  // Done button
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.of(context).popUntil((route) => route.isFirst);
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFFB20000),
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 18),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                      ),
-                      child: const Text(
-                        'Done',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
+            const SizedBox(height: 12),
+            _bigFiveCard('Openness', results.bigFive.openness),
+            const SizedBox(height: 10),
+            _bigFiveCard(
+                'Conscientiousness', results.bigFive.conscientiousness),
+            const SizedBox(height: 10),
+            _bigFiveCard('Extraversion', results.bigFive.extraversion),
+            const SizedBox(height: 10),
+            _bigFiveCard('Agreeableness', results.bigFive.agreeableness),
+            const SizedBox(height: 10),
+            _bigFiveCard('Neuroticism', results.bigFive.neuroticism),
+            const SizedBox(height: 22),
+            _disclaimerCard(),
+            const SizedBox(height: 22),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: () =>
+                    Navigator.of(context).popUntil((r) => r.isFirst),
+                icon: const Icon(Icons.check_rounded),
+                label: const Text('Done'),
               ),
             ),
           ],
@@ -178,54 +74,57 @@ class PersonalityResultsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildTypeCard() {
-    final description = PersonalityScoringService.getTypeDescription(results.mbtiLikeType);
-    
+  Widget _buildHero() {
     return Container(
-      padding: const EdgeInsets.all(24),
+      width: double.infinity,
+      padding: const EdgeInsets.all(22),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFFB20000), Color(0xFF8B0000)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(16),
+        gradient: AppColors.crimsonGradient,
+        borderRadius: BorderRadius.circular(AppRadii.xl),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFFB20000).withOpacity(0.3),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+            color: AppColors.crimson.withValues(alpha: 0.30),
+            blurRadius: 22,
+            offset: const Offset(0, 12),
           ),
         ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Row(
         children: [
-          const Text(
-            'Your Personality Type',
-            style: TextStyle(
-              fontSize: 16,
-              color: Colors.white,
-              fontWeight: FontWeight.w500,
+          Container(
+            width: 56,
+            height: 56,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: Colors.white.withValues(alpha: 0.18),
             ),
+            child: const Icon(Icons.psychology_alt_rounded,
+                color: Colors.white, size: 28),
           ),
-          const SizedBox(height: 12),
-          Text(
-            results.mbtiLikeType,
-            style: const TextStyle(
-              fontSize: 48,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-              letterSpacing: 4,
-            ),
-          ),
-          const SizedBox(height: 12),
-          Text(
-            description,
-            style: const TextStyle(
-              fontSize: 16,
-              color: Colors.white,
-              height: 1.4,
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Analysis complete',
+                  style: GoogleFonts.inter(
+                    color: Colors.white.withValues(alpha: 0.85),
+                    fontSize: 12,
+                    letterSpacing: 1.0,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'Your personality blueprint is ready.',
+                  style: GoogleFonts.playfairDisplay(
+                    color: Colors.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ],
             ),
           ),
         ],
@@ -233,22 +132,64 @@ class PersonalityResultsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildBigFiveCard(String trait, double score) {
-    final description = PersonalityScoringService.getTraitDescription(trait, score);
-    final percentage = score.toInt();
+  Widget _buildTypeCard() {
+    final description =
+        PersonalityScoringService.getTypeDescription(results.mbtiLikeType);
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(22),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(AppRadii.lg),
+        border: Border.all(color: AppColors.crimson.withValues(alpha: 0.12)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'MBTI · Jungian 16-type',
+            style: GoogleFonts.inter(
+              color: AppColors.inkMuted,
+              fontSize: 11,
+              letterSpacing: 0.8,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            results.mbtiLikeType,
+            style: GoogleFonts.playfairDisplay(
+              color: AppColors.crimson,
+              fontSize: 56,
+              fontWeight: FontWeight.w800,
+              letterSpacing: 6,
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            description,
+            style: GoogleFonts.inter(
+              color: AppColors.inkSoft,
+              fontSize: 14.5,
+              height: 1.5,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
-    Color getColor() {
-      if (score >= 70) return Colors.green;
-      if (score <= 30) return Colors.orange;
-      return Colors.blue;
-    }
+  Widget _bigFiveCard(String trait, double score) {
+    final description =
+        PersonalityScoringService.getTraitDescription(trait, score);
+    final pct = score.toInt();
 
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFB20000).withOpacity(0.2)),
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(AppRadii.lg),
+        border: Border.all(color: AppColors.crimson.withValues(alpha: 0.10)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -258,24 +199,25 @@ class PersonalityResultsScreen extends StatelessWidget {
             children: [
               Text(
                 trait,
-                style: const TextStyle(
+                style: GoogleFonts.playfairDisplay(
+                  color: AppColors.ink,
                   fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black87,
+                  fontWeight: FontWeight.w700,
                 ),
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
-                  color: getColor().withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(20),
+                  color: AppColors.crimson.withValues(alpha: 0.10),
+                  borderRadius: BorderRadius.circular(AppRadii.pill),
                 ),
                 child: Text(
-                  '$percentage%',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: getColor(),
+                  '$pct%',
+                  style: GoogleFonts.inter(
+                    color: AppColors.crimson,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w800,
                   ),
                 ),
               ),
@@ -283,21 +225,58 @@ class PersonalityResultsScreen extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           ClipRRect(
-            borderRadius: BorderRadius.circular(10),
-            child: LinearProgressIndicator(
-              value: score / 100,
-              backgroundColor: Colors.grey[200],
-              valueColor: AlwaysStoppedAnimation<Color>(getColor()),
-              minHeight: 8,
+            borderRadius: BorderRadius.circular(AppRadii.pill),
+            child: TweenAnimationBuilder<double>(
+              tween: Tween(begin: 0, end: (score / 100).clamp(0.0, 1.0)),
+              duration: const Duration(milliseconds: 700),
+              curve: Curves.easeOut,
+              builder: (context, value, _) => LinearProgressIndicator(
+                value: value,
+                minHeight: 7,
+                backgroundColor: AppColors.beigeDeep,
+                valueColor:
+                    const AlwaysStoppedAnimation<Color>(AppColors.crimson),
+              ),
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 10),
           Text(
             description,
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.grey[700],
-              height: 1.4,
+            style: GoogleFonts.inter(
+              color: AppColors.inkSoft,
+              fontSize: 13,
+              height: 1.5,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _disclaimerCard() {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppColors.beigeWarm,
+        borderRadius: BorderRadius.circular(AppRadii.md),
+        border:
+            Border.all(color: AppColors.crimson.withValues(alpha: 0.10)),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Icon(Icons.info_outline_rounded,
+              color: AppColors.inkSoft, size: 18),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              'This test uses open-source Jungian 16-type and IPIP-50 Big Five markers. It is not affiliated with The Myers-Briggs Company.',
+              style: GoogleFonts.inter(
+                color: AppColors.inkSoft,
+                fontSize: 11.5,
+                fontStyle: FontStyle.italic,
+                height: 1.4,
+              ),
             ),
           ),
         ],
@@ -305,4 +284,3 @@ class PersonalityResultsScreen extends StatelessWidget {
     );
   }
 }
-

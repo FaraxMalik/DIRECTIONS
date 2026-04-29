@@ -20,10 +20,10 @@ class _ManualPersonalityEntryScreenState extends State<ManualPersonalityEntryScr
   final PersonalityService _personalityService = PersonalityService();
   
   // MBTI Type
-  String _selectedE_I = 'E';
-  String _selectedS_N = 'S';
-  String _selectedT_F = 'T';
-  String _selectedJ_P = 'J';
+  String _selectedEI = 'E';
+  String _selectedSN = 'S';
+  String _selectedTF = 'T';
+  String _selectedJP = 'J';
   
   // Big Five scores
   final _opennessController = TextEditingController();
@@ -47,10 +47,10 @@ class _ManualPersonalityEntryScreenState extends State<ManualPersonalityEntryScr
     
     // Parse MBTI type
     if (results.mbtiLikeType.length == 4) {
-      _selectedE_I = results.mbtiLikeType[0];
-      _selectedS_N = results.mbtiLikeType[1];
-      _selectedT_F = results.mbtiLikeType[2];
-      _selectedJ_P = results.mbtiLikeType[3];
+      _selectedEI = results.mbtiLikeType[0];
+      _selectedSN = results.mbtiLikeType[1];
+      _selectedTF = results.mbtiLikeType[2];
+      _selectedJP = results.mbtiLikeType[3];
     }
     
     // Set Big Five scores
@@ -61,7 +61,7 @@ class _ManualPersonalityEntryScreenState extends State<ManualPersonalityEntryScr
     _neuroticismController.text = results.bigFive.neuroticism.toInt().toString();
   }
 
-  String get _mbtiType => '$_selectedE_I$_selectedS_N$_selectedT_F$_selectedJ_P';
+  String get _mbtiType => '$_selectedEI$_selectedSN$_selectedTF$_selectedJP';
 
   Future<void> _saveResults() async {
     if (!_formKey.currentState!.validate()) {
@@ -173,29 +173,29 @@ class _ManualPersonalityEntryScreenState extends State<ManualPersonalityEntryScr
               _buildDichotomySelector(
                 'Extraversion (E) vs Introversion (I)',
                 ['E', 'I'],
-                _selectedE_I,
-                (value) => setState(() => _selectedE_I = value),
+                _selectedEI,
+                (value) => setState(() => _selectedEI = value),
               ),
               const SizedBox(height: 12),
               _buildDichotomySelector(
                 'Sensing (S) vs Intuition (N)',
                 ['S', 'N'],
-                _selectedS_N,
-                (value) => setState(() => _selectedS_N = value),
+                _selectedSN,
+                (value) => setState(() => _selectedSN = value),
               ),
               const SizedBox(height: 12),
               _buildDichotomySelector(
                 'Thinking (T) vs Feeling (F)',
                 ['T', 'F'],
-                _selectedT_F,
-                (value) => setState(() => _selectedT_F = value),
+                _selectedTF,
+                (value) => setState(() => _selectedTF = value),
               ),
               const SizedBox(height: 12),
               _buildDichotomySelector(
                 'Judging (J) vs Perceiving (P)',
                 ['J', 'P'],
-                _selectedJ_P,
-                (value) => setState(() => _selectedJ_P = value),
+                _selectedJP,
+                (value) => setState(() => _selectedJP = value),
               ),
               const SizedBox(height: 16),
               
@@ -327,7 +327,7 @@ class _ManualPersonalityEntryScreenState extends State<ManualPersonalityEntryScr
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFB20000).withOpacity(0.2)),
+        border: Border.all(color: const Color(0xFFB20000).withValues(alpha: 0.2)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -393,7 +393,7 @@ class _ManualPersonalityEntryScreenState extends State<ManualPersonalityEntryScr
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFB20000).withOpacity(0.2)),
+        border: Border.all(color: const Color(0xFFB20000).withValues(alpha: 0.2)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -460,4 +460,8 @@ class _ManualPersonalityEntryScreenState extends State<ManualPersonalityEntryScr
     super.dispose();
   }
 }
+
+
+
+
 

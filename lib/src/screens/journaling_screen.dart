@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../services/journal_service.dart';
+import 'package:provider/provider.dart';
+
 import '../models/journal_entry.dart';
-import '../widgets/connection_status_widget.dart';
+import '../services/journal_service.dart';
+import '../theme/app_theme.dart';
+import '../widgets/paper_background.dart';
 import 'journal_editor_screen.dart';
 
 class JournalingScreen extends StatefulWidget {
@@ -15,28 +17,19 @@ class JournalingScreen extends StatefulWidget {
 
 class _JournalingScreenState extends State<JournalingScreen>
     with SingleTickerProviderStateMixin {
-  late AnimationController _animationController;
-  late Animation<double> _fadeAnimation;
+  late final AnimationController _fadeAnim;
+  late final Animation<double> _fade;
 
   @override
   void initState() {
     super.initState();
-    _animationController = AnimationController(
-      duration: const Duration(milliseconds: 800),
+    _fadeAnim = AnimationController(
       vsync: this,
+      duration: const Duration(milliseconds: 600),
     );
-    
-    _fadeAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeInOut,
-    ));
+    _fade = CurvedAnimation(parent: _fadeAnim, curve: Curves.easeOut);
+    _fadeAnim.forward();
 
-    _animationController.forward();
-    
-    // Load journal entries
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<JournalService>().loadEntries();
     });
@@ -44,388 +37,57 @@ class _JournalingScreenState extends State<JournalingScreen>
 
   @override
   void dispose() {
-    _animationController.dispose();
+    _fadeAnim.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final journalService = context.watch<JournalService>();
-    
-    return Scaffold(
-      backgroundColor: const Color(0xFFF8F6F1), // Warm paper-like background
-      appBar: AppBar(
-        elevation: 0,
-        backgroundColor: const Color(0xFFF8F6F1),
-        foregroundColor: const Color(0xFF3A2F2A),
-        title: Text(
-          'My Journal',
-          style: GoogleFonts.playfairDisplay(
-            fontSize: 24,
-            fontWeight: FontWeight.w600,
-            color: const Color(0xFF3A2F2A),
-          ),
-        ),
-        actions: [
-          IconButton(
-            onPressed: () => _showJournalInsights(context, journalService),
-            icon: const Icon(Icons.insights, color: Color(0xFF8B4513)),
-            tooltip: 'Journal Insights',
-          ),
-          IconButton(
-            onPressed: () => _createNewEntry(context),
-            icon: const Icon(Icons.edit_note, color: Color(0xFF8B4513)),
-            tooltip: 'New Entry',
-          ),
-        ],
-      ),
-      body: Column(
-        children: [
-          ConnectionStatusWidget(errorMessage: journalService.lastError),
-          Expanded(
-            child: FadeTransition(
-              opacity: _fadeAnimation,
-              child: journalService.loading && journalService.entries.isEmpty
-                  ? _buildLoadingState()
-                  : journalService.entries.isEmpty
-                      ? _buildEmptyState(context)
-                      : _buildJournalList(context, journalService),
-            ),
-          ),
-        ],
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _createNewEntry(context),
-        backgroundColor: const Color(0xFF8B4513),
-        foregroundColor: Colors.white,
-        icon: const Icon(Icons.create),
-        label: Text(
-          'Write',
-          style: GoogleFonts.inter(fontWeight: FontWeight.w600),
-        ),
-      ),
-    );
-  }
+    final entries = [...journalService.entries]
+      ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
 
-  Widget _buildLoadingState() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const CircularProgressIndicator(
-            valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF8B4513)),
-          ),
-          const SizedBox(height: 16),
-          Text(
-            'Loading your journal...',
-            style: GoogleFonts.inter(
-              color: const Color(0xFF3A2F2A),
-              fontSize: 16,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildEmptyState(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(32),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              width: 120,
-              height: 120,
-              decoration: BoxDecoration(
-                color: const Color(0xFF8B4513).withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(60),
-              ),
-              child: const Icon(
-                Icons.menu_book_rounded,
-                size: 60,
-                color: Color(0xFF8B4513),
-              ),
-            ),
-            const SizedBox(height: 24),
-            Text(
-              'Your Journal Awaits',
-              style: GoogleFonts.playfairDisplay(
-                fontSize: 28,
-                fontWeight: FontWeight.w600,
-                color: const Color(0xFF3A2F2A),
-              ),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              'Start capturing your thoughts, experiences, and daily reflections. Your words help us understand you better.',
-              textAlign: TextAlign.center,
-              style: GoogleFonts.inter(
-                fontSize: 16,
-                color: const Color(0xFF6B5B5B),
-                height: 1.5,
-              ),
-            ),
-            const SizedBox(height: 32),
-            ElevatedButton.icon(
-              onPressed: () => _createNewEntry(context),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF8B4513),
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-              icon: const Icon(Icons.create),
-              label: Text(
-                'Write First Entry',
-                style: GoogleFonts.inter(
-                  fontWeight: FontWeight.w600,
-                  fontSize: 16,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildJournalList(BuildContext context, JournalService journalService) {
-    return RefreshIndicator(
-      onRefresh: () => journalService.loadEntries(),
-      color: const Color(0xFF8B4513),
-      child: CustomScrollView(
-        slivers: [
-          // Header stats
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: _buildJournalStats(journalService),
-            ),
-          ),
-          
-          // Journal entries
-          SliverPadding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            sliver: SliverList(
-              delegate: SliverChildBuilderDelegate(
-                (context, index) {
-                  final entry = journalService.entries[index];
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 16),
-                    child: _buildJournalCard(context, entry, journalService),
-                  );
-                },
-                childCount: journalService.entries.length,
-              ),
-            ),
-          ),
-          
-          // Bottom padding for FAB
-          const SliverToBoxAdapter(
-            child: SizedBox(height: 80),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildJournalStats(JournalService journalService) {
-    final totalEntries = journalService.entries.length;
-    final totalWords = journalService.entries.fold<int>(0, (sum, entry) => sum + entry.wordCount);
-    final avgWords = totalEntries > 0 ? (totalWords / totalEntries).round() : 0;
-
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFF8B4513).withValues(alpha: 0.1),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          _buildStatItem('Entries', totalEntries.toString(), Icons.book),
-          const VerticalDivider(color: Color(0xFFE0E0E0)),
-          _buildStatItem('Words', totalWords.toString(), Icons.text_fields),
-          const VerticalDivider(color: Color(0xFFE0E0E0)),
-          _buildStatItem('Avg/Entry', avgWords.toString(), Icons.analytics),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildStatItem(String label, String value, IconData icon) {
-    return Expanded(
-      child: Column(
-        children: [
-          Icon(icon, size: 24, color: const Color(0xFF8B4513)),
-          const SizedBox(height: 4),
-          Text(
-            value,
-            style: GoogleFonts.inter(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: const Color(0xFF3A2F2A),
-            ),
-          ),
-          Text(
-            label,
-            style: GoogleFonts.inter(
-              fontSize: 12,
-              color: const Color(0xFF6B5B5B),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildJournalCard(BuildContext context, JournalEntry entry, JournalService journalService) {
-    final daysSince = DateTime.now().difference(entry.createdAt).inDays;
-    final timeText = daysSince == 0 
-        ? 'Today'
-        : daysSince == 1 
-          ? 'Yesterday'
-          : '$daysSince days ago';
-
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(16),
-          onTap: () => _editEntry(context, entry),
-          child: Padding(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        entry.title,
-                        style: GoogleFonts.playfairDisplay(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w600,
-                          color: const Color(0xFF3A2F2A),
-                        ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
+    return PaperBackground(
+      child: SafeArea(
+        bottom: false,
+        child: RefreshIndicator(
+          color: AppColors.crimson,
+          onRefresh: () => journalService.loadEntries(),
+          child: FadeTransition(
+            opacity: _fade,
+            child: CustomScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              slivers: [
+                SliverToBoxAdapter(child: _buildHeader(entries.length)),
+                if (journalService.loading && entries.isEmpty)
+                  const SliverFillRemaining(
+                    hasScrollBody: false,
+                    child: Center(
+                      child: CircularProgressIndicator(
+                          color: AppColors.crimson),
+                    ),
+                  )
+                else if (entries.isEmpty)
+                  SliverFillRemaining(
+                    hasScrollBody: false,
+                    child: _emptyState(context),
+                  )
+                else
+                  SliverPadding(
+                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 110),
+                    sliver: SliverList.separated(
+                      itemCount: entries.length,
+                      separatorBuilder: (_, __) =>
+                          const SizedBox(height: 16),
+                      itemBuilder: (_, i) => _DiaryEntryCard(
+                        entry: entries[i],
+                        index: entries.length - i,
+                        onTap: () => _editEntry(entries[i]),
+                        onDelete: () =>
+                            _confirmDelete(entries[i], journalService),
                       ),
                     ),
-                    PopupMenuButton<String>(
-                      onSelected: (value) {
-                        if (value == 'edit') {
-                          _editEntry(context, entry);
-                        } else if (value == 'delete') {
-                          _deleteEntry(context, entry, journalService);
-                        }
-                      },
-                      itemBuilder: (context) => [
-                        const PopupMenuItem(
-                          value: 'edit',
-                          child: Row(
-                            children: [
-                              Icon(Icons.edit, size: 18),
-                              SizedBox(width: 8),
-                              Text('Edit'),
-                            ],
-                          ),
-                        ),
-                        const PopupMenuItem(
-                          value: 'delete',
-                          child: Row(
-                            children: [
-                              Icon(Icons.delete, size: 18, color: Colors.red),
-                              SizedBox(width: 8),
-                              Text('Delete', style: TextStyle(color: Colors.red)),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                
-                Text(
-                  entry.content,
-                  style: GoogleFonts.inter(
-                    fontSize: 14,
-                    color: const Color(0xFF6B5B5B),
-                    height: 1.5,
                   ),
-                  maxLines: 3,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                
-                const SizedBox(height: 16),
-                
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: _getMoodColor(entry.mood).withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            _getMoodEmoji(entry.mood),
-                            style: const TextStyle(fontSize: 14),
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            entry.mood.toUpperCase(),
-                            style: GoogleFonts.inter(
-                              fontSize: 10,
-                              fontWeight: FontWeight.w600,
-                              color: _getMoodColor(entry.mood),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const Spacer(),
-                    Text(
-                      '${entry.wordCount} words',
-                      style: GoogleFonts.inter(
-                        fontSize: 12,
-                        color: const Color(0xFF8B8B8B),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      timeText,
-                      style: GoogleFonts.inter(
-                        fontSize: 12,
-                        color: const Color(0xFF8B8B8B),
-                      ),
-                    ),
-                  ],
-                ),
               ],
             ),
           ),
@@ -434,31 +96,158 @@ class _JournalingScreenState extends State<JournalingScreen>
     );
   }
 
-  Color _getMoodColor(String mood) {
-    switch (mood.toLowerCase()) {
-      case 'happy': return const Color(0xFF4CAF50);
-      case 'excited': return const Color(0xFFFF9800);
-      case 'sad': return const Color(0xFF2196F3);
-      case 'stressed': return const Color(0xFFf44336);
-      case 'calm': return const Color(0xFF9C27B0);
-      case 'grateful': return const Color(0xFFE91E63);
-      default: return const Color(0xFF607D8B);
-    }
+  Widget _buildHeader(int total) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 16, 20, 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'EST. ${DateTime.now().year}',
+                      style: GoogleFonts.inter(
+                        color: AppColors.inkMuted,
+                        fontSize: 10,
+                        letterSpacing: 2.4,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'My Diary',
+                      style: GoogleFonts.playfairDisplay(
+                        color: AppColors.crimsonDeep,
+                        fontSize: 36,
+                        fontWeight: FontWeight.w700,
+                        fontStyle: FontStyle.italic,
+                        letterSpacing: -0.5,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              _writeButton(),
+            ],
+          ),
+          const SizedBox(height: 6),
+          Row(
+            children: [
+              const PageOrnament(width: 100),
+              const SizedBox(width: 10),
+              Text(
+                total == 0
+                    ? 'a blank book, awaiting words'
+                    : '$total ${total == 1 ? "entry" : "entries"} so far',
+                style: GoogleFonts.playfairDisplay(
+                  color: AppColors.inkSoft,
+                  fontSize: 13,
+                  fontStyle: FontStyle.italic,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
   }
 
-  String _getMoodEmoji(String mood) {
-    switch (mood.toLowerCase()) {
-      case 'happy': return '😊';
-      case 'excited': return '🎉';
-      case 'sad': return '😔';
-      case 'stressed': return '😰';
-      case 'calm': return '😌';
-      case 'grateful': return '🙏';
-      default: return '😐';
-    }
+  Widget _writeButton() {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: _createNewEntry,
+        borderRadius: BorderRadius.circular(AppRadii.pill),
+        child: Container(
+          padding:
+              const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+          decoration: BoxDecoration(
+            gradient: AppColors.crimsonGradient,
+            borderRadius: BorderRadius.circular(AppRadii.pill),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.crimson.withValues(alpha: 0.30),
+                blurRadius: 12,
+                offset: const Offset(0, 5),
+              ),
+            ],
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.edit_note_rounded,
+                  color: Colors.white, size: 18),
+              const SizedBox(width: 6),
+              Text(
+                'New page',
+                style: GoogleFonts.inter(
+                  color: Colors.white,
+                  fontSize: 12.5,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
-  void _createNewEntry(BuildContext context) {
+  Widget _emptyState(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(40),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: AppColors.crimson.withValues(alpha: 0.06),
+              border: Border.all(
+                  color: AppColors.crimson.withValues(alpha: 0.20)),
+            ),
+            child: const Icon(Icons.auto_stories_rounded,
+                size: 56, color: AppColors.crimsonDark),
+          ),
+          const SizedBox(height: 28),
+          Text(
+            'A fresh, untouched book.',
+            textAlign: TextAlign.center,
+            style: GoogleFonts.playfairDisplay(
+              color: AppColors.ink,
+              fontSize: 22,
+              fontStyle: FontStyle.italic,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          const SizedBox(height: 10),
+          Text(
+            'Start by writing your first page —\na thought, a worry, a small win, anything.',
+            textAlign: TextAlign.center,
+            style: GoogleFonts.playfairDisplay(
+              color: AppColors.inkSoft,
+              fontSize: 14,
+              height: 1.55,
+              fontStyle: FontStyle.italic,
+            ),
+          ),
+          const SizedBox(height: 24),
+          ElevatedButton.icon(
+            onPressed: _createNewEntry,
+            icon: const Icon(Icons.create_rounded),
+            label: const Text('Open the first page'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _createNewEntry() {
     final newEntry = JournalEntry(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
       title: '',
@@ -467,93 +256,407 @@ class _JournalingScreenState extends State<JournalingScreen>
       modifiedAt: DateTime.now(),
       wordCount: 0,
     );
-    
     context.read<JournalService>().setCurrentEntry(newEntry);
-    
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => const JournalEditorScreen(isNewEntry: true),
+        builder: (_) => const JournalEditorScreen(isNewEntry: true),
       ),
     );
   }
 
-  void _editEntry(BuildContext context, JournalEntry entry) {
+  void _editEntry(JournalEntry entry) {
     context.read<JournalService>().setCurrentEntry(entry);
-    
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => const JournalEditorScreen(isNewEntry: false),
+        builder: (_) => const JournalEditorScreen(isNewEntry: false),
       ),
     );
   }
 
-  void _deleteEntry(BuildContext context, JournalEntry entry, JournalService journalService) {
+  void _confirmDelete(JournalEntry entry, JournalService service) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
+        backgroundColor: AppColors.cream,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppRadii.lg),
+        ),
         title: Text(
-          'Delete Entry',
+          'Tear out this page?',
           style: GoogleFonts.playfairDisplay(
-            fontWeight: FontWeight.w600,
+            fontWeight: FontWeight.w700,
+            fontStyle: FontStyle.italic,
+            color: AppColors.ink,
           ),
         ),
         content: Text(
-          'Are you sure you want to delete "${entry.title}"? This action cannot be undone.',
-          style: GoogleFonts.inter(),
+          'Once removed, "${entry.title.isEmpty ? "this entry" : entry.title}" cannot be brought back.',
+          style: GoogleFonts.inter(color: AppColors.inkSoft, fontSize: 14),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: const Text('Keep'),
           ),
           TextButton(
             onPressed: () {
-              journalService.deleteEntry(entry.id);
+              service.deleteEntry(entry.id);
               Navigator.pop(context);
             },
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('Delete'),
+            style: TextButton.styleFrom(foregroundColor: AppColors.danger),
+            child: const Text('Tear out'),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _DiaryEntryCard extends StatelessWidget {
+  final JournalEntry entry;
+  final int index;
+  final VoidCallback onTap;
+  final VoidCallback onDelete;
+
+  const _DiaryEntryCard({
+    required this.entry,
+    required this.index,
+    required this.onTap,
+    required this.onDelete,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(AppRadii.lg),
+        child: Stack(
+          children: [
+            Container(
+              decoration: BoxDecoration(
+                color: AppColors.cream,
+                borderRadius: BorderRadius.circular(AppRadii.lg),
+                border: Border.all(
+                    color: AppColors.crimson.withValues(alpha: 0.15)),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.crimsonDeep.withValues(alpha: 0.10),
+                    blurRadius: 14,
+                    offset: const Offset(0, 6),
+                  ),
+                ],
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(AppRadii.lg),
+                child: CustomPaint(
+                  painter: _PageEdgePainter(),
+                  child: Padding(
+                    padding:
+                        const EdgeInsets.fromLTRB(20, 18, 20, 16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _dateLine(),
+                        const SizedBox(height: 6),
+                        Text(
+                          entry.title.isNotEmpty
+                              ? entry.title
+                              : 'Untitled page',
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: GoogleFonts.playfairDisplay(
+                            color: AppColors.ink,
+                            fontSize: 22,
+                            fontWeight: FontWeight.w700,
+                            fontStyle: FontStyle.italic,
+                            height: 1.15,
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        if (entry.content.isNotEmpty)
+                          Text(
+                            entry.content,
+                            maxLines: 4,
+                            overflow: TextOverflow.ellipsis,
+                            style: GoogleFonts.playfairDisplay(
+                              color: AppColors.inkSoft,
+                              fontSize: 14,
+                              height: 1.6,
+                            ),
+                          ),
+                        const SizedBox(height: 14),
+                        Row(
+                          children: [
+                            _moodChip(),
+                            const SizedBox(width: 10),
+                            Container(
+                              width: 4,
+                              height: 4,
+                              decoration: BoxDecoration(
+                                color: AppColors.inkMuted
+                                    .withValues(alpha: 0.5),
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            Text(
+                              '${entry.wordCount} words',
+                              style: GoogleFonts.inter(
+                                color: AppColors.inkMuted,
+                                fontSize: 11,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            const Spacer(),
+                            _menuButton(context),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            // Page-number ribbon in the corner
+            Positioned(
+              top: 0,
+              right: 14,
+              child: _pageNumber(),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _pageNumber() {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(8, 6, 8, 8),
+      decoration: BoxDecoration(
+        gradient: AppColors.crimsonGradient,
+        borderRadius: const BorderRadius.only(
+          bottomLeft: Radius.circular(8),
+          bottomRight: Radius.circular(8),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.crimson.withValues(alpha: 0.30),
+            blurRadius: 6,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            'No.',
+            style: GoogleFonts.playfairDisplay(
+              color: Colors.white.withValues(alpha: 0.85),
+              fontSize: 8,
+              fontStyle: FontStyle.italic,
+            ),
+          ),
+          Text(
+            '$index',
+            style: GoogleFonts.playfairDisplay(
+              color: Colors.white,
+              fontSize: 14,
+              fontWeight: FontWeight.w800,
+              height: 1,
+            ),
           ),
         ],
       ),
     );
   }
 
-  void _showJournalInsights(BuildContext context, JournalService journalService) {
-    final insights = journalService.getJournalInsights();
-    
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(
-          'Journal Insights',
-          style: GoogleFonts.playfairDisplay(
+  Widget _dateLine() {
+    final dt = entry.createdAt;
+    final wd = _weekday(dt.weekday);
+    final mn = _monthName(dt.month);
+    final dayOrd = _ordinal(dt.day);
+    final time =
+        '${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
+
+    return Row(
+      children: [
+        Expanded(
+          child: Text(
+            '$wd, the $dayOrd of $mn ${dt.year}',
+            style: GoogleFonts.playfairDisplay(
+              color: AppColors.crimsonDark,
+              fontSize: 12,
+              fontStyle: FontStyle.italic,
+              fontWeight: FontWeight.w500,
+              letterSpacing: 0.3,
+            ),
+          ),
+        ),
+        Text(
+          time,
+          style: GoogleFonts.inter(
+            color: AppColors.inkMuted,
+            fontSize: 10,
             fontWeight: FontWeight.w600,
+            letterSpacing: 0.5,
           ),
         ),
-        content: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text('Total Entries: ${insights['totalEntries']}'),
-              Text('Total Words: ${insights['totalWords']}'),
-              Text('Average Words/Entry: ${insights['averageWordsPerEntry']}'),
-              Text('Dominant Mood: ${insights['dominantMood']}'),
-              const SizedBox(height: 8),
-              Text('Writing helps us understand your personality and thought patterns for better career guidance.'),
-            ],
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Close'),
+      ],
+    );
+  }
+
+  Widget _moodChip() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+        color: AppColors.crimson.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(AppRadii.pill),
+        border: Border.all(color: AppColors.crimson.withValues(alpha: 0.18)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(_moodEmoji(entry.mood),
+              style: const TextStyle(fontSize: 12)),
+          const SizedBox(width: 5),
+          Text(
+            entry.mood,
+            style: GoogleFonts.inter(
+              color: AppColors.crimsonDark,
+              fontSize: 10.5,
+              fontWeight: FontWeight.w700,
+              letterSpacing: 0.4,
+            ),
           ),
         ],
       ),
     );
   }
+
+  Widget _menuButton(BuildContext context) {
+    return PopupMenuButton<String>(
+      tooltip: 'More',
+      icon: const Icon(Icons.more_horiz_rounded,
+          color: AppColors.inkMuted, size: 20),
+      color: AppColors.cream,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppRadii.md),
+        side: BorderSide(color: AppColors.crimson.withValues(alpha: 0.15)),
+      ),
+      onSelected: (v) {
+        if (v == 'edit') onTap();
+        if (v == 'delete') onDelete();
+      },
+      itemBuilder: (_) => [
+        PopupMenuItem(
+          value: 'edit',
+          child: Row(
+            children: [
+              const Icon(Icons.edit_outlined,
+                  size: 16, color: AppColors.ink),
+              const SizedBox(width: 8),
+              Text('Edit',
+                  style: GoogleFonts.inter(
+                      color: AppColors.ink,
+                      fontWeight: FontWeight.w500,
+                      fontSize: 13)),
+            ],
+          ),
+        ),
+        PopupMenuItem(
+          value: 'delete',
+          child: Row(
+            children: [
+              const Icon(Icons.delete_outline_rounded,
+                  size: 16, color: AppColors.danger),
+              const SizedBox(width: 8),
+              Text('Tear out',
+                  style: GoogleFonts.inter(
+                      color: AppColors.danger,
+                      fontWeight: FontWeight.w500,
+                      fontSize: 13)),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  String _moodEmoji(String mood) {
+    switch (mood.toLowerCase()) {
+      case 'happy':
+        return '😊';
+      case 'excited':
+        return '🎉';
+      case 'sad':
+        return '😔';
+      case 'stressed':
+        return '😰';
+      case 'anxious':
+        return '😟';
+      case 'calm':
+        return '😌';
+      case 'grateful':
+        return '🙏';
+      default:
+        return '🖋';
+    }
+  }
+
+  String _weekday(int wd) =>
+      const ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'][wd - 1];
+
+  String _monthName(int m) => const [
+        'January',
+        'February',
+        'March',
+        'April',
+        'May',
+        'June',
+        'July',
+        'August',
+        'September',
+        'October',
+        'November',
+        'December'
+      ][m - 1];
+
+  String _ordinal(int day) {
+    if (day >= 11 && day <= 13) return '${day}th';
+    switch (day % 10) {
+      case 1:
+        return '${day}st';
+      case 2:
+        return '${day}nd';
+      case 3:
+        return '${day}rd';
+      default:
+        return '${day}th';
+    }
+  }
+}
+
+/// Paints a soft inner shadow / page-edge to give the card a worn paper feel.
+class _PageEdgePainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..shader = LinearGradient(
+        colors: [
+          AppColors.crimsonDeep.withValues(alpha: 0.06),
+          Colors.transparent,
+        ],
+        begin: Alignment.topLeft,
+        end: Alignment.center,
+      ).createShader(Offset.zero & size);
+    canvas.drawRect(Offset.zero & size, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

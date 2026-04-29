@@ -1,7 +1,12 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+
+import '../models/quiz_result.dart';
 import '../services/results_service.dart';
+import '../theme/app_theme.dart';
+import '../widgets/career_suggestion_view.dart';
+import 'home_screen.dart';
 
 class ResultsScreen extends StatefulWidget {
   const ResultsScreen({super.key});
@@ -14,346 +19,350 @@ class _ResultsScreenState extends State<ResultsScreen> {
   @override
   void initState() {
     super.initState();
-    // Load results when screen opens
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final resultsService = Provider.of<ResultsService>(context, listen: false);
-      resultsService.load();
+      context.read<ResultsService>().load();
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final resultsService = Provider.of<ResultsService>(context);
-    final results = resultsService.results;
-    final loading = resultsService.loading;
-
-    return Scaffold(
-      backgroundColor: const Color(0xFFFFFEF0),
-      appBar: AppBar(
-        title: const Text('Your Results'),
-        elevation: 0,
-      ),
-      body: loading
-          ? Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(40),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: const Color(0xFFB20000).withOpacity(0.2),
-                          blurRadius: 30,
-                          spreadRadius: 10,
-                        ),
-                      ],
-                    ),
-                    child: const CircularProgressIndicator(
-                      color: Color(0xFFB20000),
-                      strokeWidth: 4,
+    return SafeArea(
+      child: Consumer<ResultsService>(
+        builder: (context, service, _) {
+          final results = service.results;
+          return RefreshIndicator(
+            color: AppColors.crimson,
+            onRefresh: service.load,
+            child: CustomScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              slivers: [
+                SliverPadding(
+                  padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
+                  sliver: SliverToBoxAdapter(child: _header()),
+                ),
+                if (results.isEmpty)
+                  SliverFillRemaining(
+                    hasScrollBody: false,
+                    child: _emptyState(context),
+                  )
+                else
+                  SliverPadding(
+                    padding: const EdgeInsets.fromLTRB(20, 16, 20, 110),
+                    sliver: SliverList.separated(
+                      itemCount: results.length,
+                      separatorBuilder: (_, __) =>
+                          const SizedBox(height: 14),
+                      itemBuilder: (_, i) =>
+                          _resultCard(context, results[i]),
                     ),
                   ),
-                  const SizedBox(height: 32),
-                  const Text(
-                    'Loading your results...',
-                    style: TextStyle(
-                      fontSize: 20,
-                      color: Color(0xFFB20000),
-                      fontWeight: FontWeight.w600,
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _header() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Your results',
+          style: GoogleFonts.playfairDisplay(
+            color: AppColors.ink,
+            fontSize: 30,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        const SizedBox(height: 6),
+        Text(
+          'A history of every AI-driven career analysis built around you.',
+          style: GoogleFonts.inter(
+            color: AppColors.inkSoft,
+            fontSize: 13.5,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _emptyState(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(32, 0, 32, 80),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              width: 100,
+              height: 100,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: AppColors.crimson.withValues(alpha: 0.08),
+              ),
+              child: const Icon(Icons.emoji_events_rounded,
+                  color: AppColors.crimson, size: 48),
+            ),
+            const SizedBox(height: 22),
+            Text(
+              'No results yet.',
+              style: GoogleFonts.playfairDisplay(
+                color: AppColors.ink,
+                fontSize: 22,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Take the career quiz once to see AI-curated career recommendations here.',
+              textAlign: TextAlign.center,
+              style: GoogleFonts.inter(
+                color: AppColors.inkSoft,
+                fontSize: 14,
+                height: 1.5,
+              ),
+            ),
+            const SizedBox(height: 22),
+            ElevatedButton.icon(
+              onPressed: () =>
+                  HomeNavigation.of(context)?.goTo(HomeTab.quiz),
+              icon: const Icon(Icons.play_arrow_rounded),
+              label: const Text('Start the quiz'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _resultCard(BuildContext context, QuizResult r) {
+    final dateText = '${r.createdAt.day.toString().padLeft(2, '0')}'
+        '/${r.createdAt.month.toString().padLeft(2, '0')}'
+        '/${r.createdAt.year}';
+
+    return Material(
+      color: AppColors.surface,
+      borderRadius: BorderRadius.circular(AppRadii.lg),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(AppRadii.lg),
+        onTap: () => _openDetail(context, r),
+        child: Container(
+          padding: const EdgeInsets.all(18),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(AppRadii.lg),
+            border:
+                Border.all(color: AppColors.crimson.withValues(alpha: 0.10)),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 10, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: AppColors.crimson.withValues(alpha: 0.10),
+                      borderRadius: BorderRadius.circular(AppRadii.pill),
+                    ),
+                    child: Text(
+                      r.personalityType ?? 'Career',
+                      style: GoogleFonts.inter(
+                        color: AppColors.crimson,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 0.6,
+                      ),
+                    ),
+                  ),
+                  const Spacer(),
+                  Text(
+                    dateText,
+                    style: GoogleFonts.inter(
+                      color: AppColors.inkMuted,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
                 ],
               ),
-            )
-          : results.isEmpty
-              ? Center(
-                  child: Padding(
-                    padding: const EdgeInsets.all(32.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
+              if (r.recommendedCareers.isNotEmpty) ...[
+                const SizedBox(height: 14),
+                Text(
+                  'Top recommendations',
+                  style: GoogleFonts.inter(
+                    fontSize: 11,
+                    color: AppColors.inkMuted,
+                    letterSpacing: 0.8,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                ...r.recommendedCareers.asMap().entries.map((entry) {
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 6),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Container(
-                          padding: const EdgeInsets.all(40),
+                          width: 22,
+                          height: 22,
                           decoration: BoxDecoration(
-                            color: Colors.white,
                             shape: BoxShape.circle,
-                            boxShadow: [
-                              BoxShadow(
-                                color: const Color(0xFFB20000).withOpacity(0.1),
-                                blurRadius: 30,
-                                spreadRadius: 10,
+                            gradient: AppColors.crimsonGradient,
+                          ),
+                          alignment: Alignment.center,
+                          child: Text(
+                            '${entry.key + 1}',
+                            style: GoogleFonts.playfairDisplay(
+                              color: Colors.white,
+                              fontSize: 11,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.only(top: 2),
+                            child: Text(
+                              entry.value,
+                              style: GoogleFonts.playfairDisplay(
+                                fontSize: 15,
+                                color: AppColors.ink,
+                                fontWeight: FontWeight.w600,
+                                height: 1.3,
                               ),
-                            ],
-                          ),
-                          child: const Icon(
-                            Icons.article_outlined,
-                            size: 80,
-                            color: Color(0xFFB20000),
-                          ),
-                        ),
-                        const SizedBox(height: 32),
-                        const Text(
-                          'No Results Yet',
-                          style: TextStyle(
-                            fontSize: 28,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFFB20000),
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          'Take a career quiz to get personalized recommendations and build your career profile.',
-                          style: TextStyle(
-                            fontSize: 17,
-                            color: Colors.grey[700],
-                            height: 1.6,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                        const SizedBox(height: 48),
-                        ElevatedButton.icon(
-                          onPressed: () => Navigator.of(context).pop(),
-                          icon: const Icon(Icons.quiz_outlined, size: 24),
-                          label: const Text(
-                            'Take Quiz',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFFB20000),
-                            foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 40,
-                              vertical: 20,
-                            ),
-                            elevation: 0,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16),
                             ),
                           ),
                         ),
                       ],
                     ),
+                  );
+                }),
+              ],
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  Text(
+                    'View full breakdown',
+                    style: GoogleFonts.inter(
+                      color: AppColors.crimson,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
-                )
-              : CustomScrollView(
-                  slivers: [
-                    SliverToBoxAdapter(
-                      child: Padding(
-                        padding: const EdgeInsets.all(20.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.all(16),
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xFFB20000).withOpacity(0.1),
-                                    borderRadius: BorderRadius.circular(16),
-                                  ),
-                                  child: const Icon(
-                                    Icons.emoji_events,
-                                    color: Color(0xFFB20000),
-                                    size: 32,
-                                  ),
-                                ),
-                                const SizedBox(width: 16),
-                                const Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        'Career Results',
-                                        style: TextStyle(
-                                          fontSize: 28,
-                                          fontWeight: FontWeight.bold,
-                                          color: Color(0xFFB20000),
-                                        ),
-                                      ),
-                                      SizedBox(height: 4),
-                                      Text(
-                                        'Your personalized recommendations',
-                                        style: TextStyle(
-                                          fontSize: 15,
-                                          color: Colors.grey,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 12),
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 16,
-                                vertical: 12,
-                              ),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFB20000).withOpacity(0.05),
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: Row(
-                                children: [
-                                  const Icon(
-                                    Icons.info_outline,
-                                    color: Color(0xFFB20000),
-                                    size: 20,
-                                  ),
-                                  const SizedBox(width: 12),
-                                  Expanded(
-                                    child: Text(
-                                      '${results.length} ${results.length == 1 ? "Result" : "Results"} Found',
-                                      style: const TextStyle(
-                                        color: Color(0xFFB20000),
-                                        fontWeight: FontWeight.w600,
-                                        fontSize: 15,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    SliverPadding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      sliver: SliverList(
-                        delegate: SliverChildBuilderDelegate(
-                          (context, index) {
-                            final result = results[index];
-                            final description = result.description ?? '';
-                            final lines = description.split('\n');
-                            final title = lines.isNotEmpty
-                                ? lines[0]
-                                : result.recommendedCareers.join(', ');
-                            final body = lines.length > 1
-                                ? lines.sublist(1).join('\n')
-                                : '';
-
-                            return Container(
-                              margin: const EdgeInsets.only(bottom: 16),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(20),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withOpacity(0.05),
-                                    blurRadius: 15,
-                                    offset: const Offset(0, 4),
-                                  ),
-                                ],
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.all(20),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      children: [
-                                        Container(
-                                          padding: const EdgeInsets.all(12),
-                                          decoration: BoxDecoration(
-                                            color: const Color(0xFFB20000)
-                                                .withOpacity(0.1),
-                                            borderRadius:
-                                                BorderRadius.circular(12),
-                                          ),
-                                          child: const Icon(
-                                            Icons.star_rounded,
-                                            size: 28,
-                                            color: Color(0xFFB20000),
-                                          ),
-                                        ),
-                                        const SizedBox(width: 16),
-                                        Expanded(
-                                          child: Text(
-                                            title,
-                                            style: const TextStyle(
-                                              fontSize: 20,
-                                              fontWeight: FontWeight.bold,
-                                              color: Color(0xFF8B0000),
-                                              height: 1.3,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    const SizedBox(height: 16),
-                                    Container(
-                                      padding: const EdgeInsets.all(16),
-                                      decoration: BoxDecoration(
-                                        color: const Color(0xFFFFFEF0),
-                                        borderRadius: BorderRadius.circular(12),
-                                      ),
-                                      child: Text(
-                                        body,
-                                        style: const TextStyle(
-                                          fontSize: 16,
-                                          color: Colors.black87,
-                                          height: 1.6,
-                                        ),
-                                      ),
-                                    ),
-                                    const SizedBox(height: 16),
-                                    Row(
-                                      children: [
-                                        Container(
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: 12,
-                                            vertical: 6,
-                                          ),
-                                          decoration: BoxDecoration(
-                                            color: const Color(0xFFB20000)
-                                                .withOpacity(0.1),
-                                            borderRadius:
-                                                BorderRadius.circular(8),
-                                          ),
-                                          child: Row(
-                                            children: [
-                                              const Icon(
-                                                Icons.calendar_today,
-                                                size: 14,
-                                                color: Color(0xFFB20000),
-                                              ),
-                                              const SizedBox(width: 6),
-                                              Text(
-                                                result.createdAt
-                                                    .toString()
-                                                    .split(' ')[0],
-                                                style: const TextStyle(
-                                                  fontSize: 13,
-                                                  color: Color(0xFFB20000),
-                                                  fontWeight: FontWeight.w600,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            );
-                          },
-                          childCount: results.length,
-                        ),
-                      ),
-                    ),
-                    const SliverToBoxAdapter(
-                      child: SizedBox(height: 20),
-                    ),
-                  ],
-                ),
+                  const SizedBox(width: 4),
+                  const Icon(Icons.arrow_forward_rounded,
+                      size: 14, color: AppColors.crimson),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
     );
+  }
+
+  void _openDetail(BuildContext context, QuizResult r) {
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => _ResultDetailScreen(result: r)),
+    );
+  }
+}
+
+class _ResultDetailScreen extends StatelessWidget {
+  final QuizResult result;
+  const _ResultDetailScreen({required this.result});
+
+  @override
+  Widget build(BuildContext context) {
+    final dateText =
+        '${_monthName(result.createdAt.month)} ${result.createdAt.day}, '
+        '${result.createdAt.year}';
+
+    return Scaffold(
+      backgroundColor: AppColors.beige,
+      appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_rounded, color: AppColors.ink),
+          onPressed: () => Navigator.maybePop(context),
+        ),
+        title: Text(
+          'Career analysis',
+          style: GoogleFonts.playfairDisplay(
+            fontSize: 20,
+            fontWeight: FontWeight.w700,
+            color: AppColors.ink,
+          ),
+        ),
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(Icons.event_rounded,
+                    size: 14, color: AppColors.inkMuted),
+                const SizedBox(width: 6),
+                Text(
+                  dateText,
+                  style: GoogleFonts.inter(
+                    color: AppColors.inkMuted,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: 0.4,
+                  ),
+                ),
+                if (result.personalityType != null) ...[
+                  const SizedBox(width: 12),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 10, vertical: 3),
+                    decoration: BoxDecoration(
+                      color: AppColors.crimson.withValues(alpha: 0.10),
+                      borderRadius: BorderRadius.circular(AppRadii.pill),
+                    ),
+                    child: Text(
+                      result.personalityType!,
+                      style: GoogleFonts.inter(
+                        color: AppColors.crimson,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 0.8,
+                      ),
+                    ),
+                  ),
+                ],
+              ],
+            ),
+            const SizedBox(height: 18),
+            CareerSuggestionView(rawResponse: result.description ?? ''),
+          ],
+        ),
+      ),
+    );
+  }
+
+  String _monthName(int m) {
+    const names = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec'
+    ];
+    return names[(m - 1).clamp(0, 11)];
   }
 }

@@ -1,0 +1,322 @@
+JUNGIAN 16-TYPE PERSONALITY TEST QUESTIONS
+==========================================
+
+This test helps determine your MBTI-like personality type through four dichotomies:
+- Extraversion (E) vs Introversion (I)
+- Sensing (S) vs Intuition (N) 
+- Thinking (T) vs Feeling (F)
+- Judging (J) vs Perceiving (P)
+
+Instructions: For each question, choose how much you agree or disagree on a scale of 1-5:
+1 = Strongly Disagree
+2 = Disagree
+3 = Neutral
+4 = Agree
+5 = Strongly Agree
+
+==========================================
+
+QUESTION 1
+You find it takes effort to introduce yourself to other people.
+Dimension: E (Extraversion) - Reverse scored
+Scale: 1-5 (Strongly Disagree to Strongly Agree)
+
+QUESTION 2
+You often get so lost in thoughts that you ignore or forget your surroundings.
+Dimension: S (Sensing) - Reverse scored
+Scale: 1-5 (Strongly Disagree to Strongly Agree)
+
+QUESTION 3
+You try to respond to your emails as soon as possible and cannot stand a messy inbox.
+Dimension: J (Judging)
+Scale: 1-5 (Strongly Disagree to Strongly Agree)
+
+QUESTION 4
+You find it easy to stay relaxed and focused even when there is some pressure.
+Dimension: T (Thinking)
+Scale: 1-5 (Strongly Disagree to Strongly Agree)
+
+QUESTION 5
+You do not usually initiate conversations.
+Dimension: E (Extraversion) - Reverse scored
+Scale: 1-5 (Strongly Disagree to Strongly Agree)
+
+QUESTION 6
+You rarely do something just out of sheer curiosity.
+Dimension: N (Intuition) - Reverse scored
+Scale: 1-5 (Strongly Disagree to Strongly Agree)
+
+QUESTION 7
+You feel superior to other people.
+Dimension: T (Thinking)
+Scale: 1-5 (Strongly Disagree to Strongly Agree)
+
+QUESTION 8
+Being organized is more important to you than being adaptable.
+Dimension: J (Judging)
+Scale: 1-5 (Strongly Disagree to Strongly Agree)
+
+QUESTION 9
+You are usually highly motivated and energetic.
+Dimension: E (Extraversion)
+Scale: 1-5 (Strongly Disagree to Strongly Agree)
+
+QUESTION 10
+Winning a debate matters less to you than making sure no one gets upset.
+Dimension: F (Feeling)
+Scale: 1-5 (Strongly Disagree to Strongly Agree)
+
+QUESTION 11
+You often feel as if you have to justify yourself to other people.
+Dimension: F (Feeling)
+Scale: 1-5 (Strongly Disagree to Strongly Agree)
+
+QUESTION 12
+Your home and work environments are quite tidy.
+Dimension: J (Judging)
+Scale: 1-5 (Strongly Disagree to Strongly Agree)
+
+QUESTION 13
+You do not mind being at the center of attention.
+Dimension: E (Extraversion)
+Scale: 1-5 (Strongly Disagree to Strongly Agree)
+
+QUESTION 14
+You consider yourself more practical than creative.
+Dimension: S (Sensing)
+Scale: 1-5 (Strongly Disagree to Strongly Agree)
+
+QUESTION 15
+You usually base your decisions on facts rather than feelings.
+Dimension: T (Thinking)
+Scale: 1-5 (Strongly Disagree to Strongly Agree)
+
+QUESTION 16
+Your living and working spaces are clean and organized.
+Dimension: J (Judging)
+Scale: 1-5 (Strongly Disagree to Strongly Agree)
+
+QUESTION 17
+You avoid making phone calls.
+Dimension: E (Extraversion) - Reverse scored
+Scale: 1-5 (Strongly Disagree to Strongly Agree)
+
+QUESTION 18
+You often spend time exploring unrealistic and impractical yet intriguing ideas.
+Dimension: N (Intuition)
+Scale: 1-5 (Strongly Disagree to Strongly Agree)
+
+QUESTION 19
+You think that everyone's views should be respected regardless of whether they are supported by facts or not.
+Dimension: F (Feeling)
+Scale: 1-5 (Strongly Disagree to Strongly Agree)
+
+QUESTION 20
+You prefer to do your chores before allowing yourself to relax.
+Dimension: J (Judging)
+Scale: 1-5 (Strongly Disagree to Strongly Agree)
+
+QUESTION 21
+You enjoy participating in group activities.
+Dimension: E (Extraversion)
+Scale: 1-5 (Strongly Disagree to Strongly Agree)
+
+QUESTION 22
+You like books and movies that make you come up with your own interpretation of the ending.
+Dimension: N (Intuition)
+Scale: 1-5 (Strongly Disagree to Strongly Agree)
+
+QUESTION 23
+Your happiness comes more from helping others accomplish things than your own accomplishments.
+Dimension: F (Feeling)
+Scale: 1-5 (Strongly Disagree to Strongly Agree)
+
+QUESTION 24
+You are interested in so many things that you find it difficult to choose what to try next.
+Dimension: P (Perceiving)
+Scale: 1-5 (Strongly Disagree to Strongly Agree)
+
+QUESTION 25
+You are a relatively reserved and quiet person.
+Dimension: I (Introversion)
+Scale: 1-5 (Strongly Disagree to Strongly Agree)
+
+QUESTION 26
+If you had a business, you would find it very difficult to fire loyal but underperforming employees.
+Dimension: F (Feeling)
+Scale: 1-5 (Strongly Disagree to Strongly Agree)
+
+QUESTION 27
+You often contemplate the reasons for human existence.
+Dimension: N (Intuition)
+Scale: 1-5 (Strongly Disagree to Strongly Agree)
+
+QUESTION 28
+Logic is usually more important than heart when it comes to making important decisions.
+Dimension: T (Thinking)
+Scale: 1-5 (Strongly Disagree to Strongly Agree)
+
+QUESTION 29
+You usually prefer just doing what you feel like at any given moment instead of planning a particular daily routine.
+Dimension: P (Perceiving)
+Scale: 1-5 (Strongly Disagree to Strongly Agree)
+
+QUESTION 30
+You rarely worry about whether you make a good impression on people you meet.
+Dimension: I (Introversion)
+Scale: 1-5 (Strongly Disagree to Strongly Agree)
+
+QUESTION 31
+You enjoy experimenting with new and untested approaches.
+Dimension: N (Intuition)
+Scale: 1-5 (Strongly Disagree to Strongly Agree)
+
+QUESTION 32
+You prioritize and plan tasks effectively, often completing them well before the deadline.
+Dimension: J (Judging)
+Scale: 1-5 (Strongly Disagree to Strongly Agree)
+
+QUESTION 33
+You are not easily affected by strong emotions.
+Dimension: T (Thinking)
+Scale: 1-5 (Strongly Disagree to Strongly Agree)
+
+QUESTION 34
+You have a system for everything you do.
+Dimension: J (Judging)
+Scale: 1-5 (Strongly Disagree to Strongly Agree)
+
+QUESTION 35
+You become bored or lose interest when the discussion gets highly theoretical.
+Dimension: S (Sensing)
+Scale: 1-5 (Strongly Disagree to Strongly Agree)
+
+QUESTION 36
+You find it easy to empathize with a person whose experiences are very different from yours.
+Dimension: F (Feeling)
+Scale: 1-5 (Strongly Disagree to Strongly Agree)
+
+QUESTION 37
+You usually postpone finalizing decisions for as long as possible.
+Dimension: P (Perceiving)
+Scale: 1-5 (Strongly Disagree to Strongly Agree)
+
+QUESTION 38
+You rarely second-guess the choices that you have made.
+Dimension: T (Thinking)
+Scale: 1-5 (Strongly Disagree to Strongly Agree)
+
+QUESTION 39
+After a long and exhausting week, a lively social event is just what you need.
+Dimension: E (Extraversion)
+Scale: 1-5 (Strongly Disagree to Strongly Agree)
+
+QUESTION 40
+You enjoy going to art museums.
+Dimension: N (Intuition)
+Scale: 1-5 (Strongly Disagree to Strongly Agree)
+
+QUESTION 41
+You often have a hard time understanding other people's feelings.
+Dimension: T (Thinking)
+Scale: 1-5 (Strongly Disagree to Strongly Agree)
+
+QUESTION 42
+You like to have a to-do list for each day.
+Dimension: J (Judging)
+Scale: 1-5 (Strongly Disagree to Strongly Agree)
+
+QUESTION 43
+You rarely feel insecure.
+Dimension: E (Extraversion)
+Scale: 1-5 (Strongly Disagree to Strongly Agree)
+
+QUESTION 44
+You have no difficulties coming up with a personal timetable and sticking to it.
+Dimension: J (Judging)
+Scale: 1-5 (Strongly Disagree to Strongly Agree)
+
+QUESTION 45
+Being right is more important than being cooperative when it comes to teamwork.
+Dimension: T (Thinking)
+Scale: 1-5 (Strongly Disagree to Strongly Agree)
+
+QUESTION 46
+You are very intrigued by things labeled as controversial.
+Dimension: N (Intuition)
+Scale: 1-5 (Strongly Disagree to Strongly Agree)
+
+QUESTION 47
+You would rather improvise than spend time coming up with a detailed plan.
+Dimension: P (Perceiving)
+Scale: 1-5 (Strongly Disagree to Strongly Agree)
+
+QUESTION 48
+You are a person of few words.
+Dimension: I (Introversion)
+Scale: 1-5 (Strongly Disagree to Strongly Agree)
+
+QUESTION 49
+You often take initiative in social situations.
+Dimension: E (Extraversion)
+Scale: 1-5 (Strongly Disagree to Strongly Agree)
+
+QUESTION 50
+You prioritize facts over people's feelings when determining a course of action.
+Dimension: T (Thinking)
+Scale: 1-5 (Strongly Disagree to Strongly Agree)
+
+QUESTION 51
+You often allow the day to unfold without any schedule at all.
+Dimension: P (Perceiving)
+Scale: 1-5 (Strongly Disagree to Strongly Agree)
+
+QUESTION 52
+You are still bothered by mistakes that you made a long time ago.
+Dimension: F (Feeling)
+Scale: 1-5 (Strongly Disagree to Strongly Agree)
+
+QUESTION 53
+You prefer to completely finish one project before starting another.
+Dimension: J (Judging)
+Scale: 1-5 (Strongly Disagree to Strongly Agree)
+
+QUESTION 54
+You are very good at improvising in difficult situations.
+Dimension: P (Perceiving)
+Scale: 1-5 (Strongly Disagree to Strongly Agree)
+
+QUESTION 55
+You are very sentimental.
+Dimension: F (Feeling)
+Scale: 1-5 (Strongly Disagree to Strongly Agree)
+
+QUESTION 56
+You like to use organizing tools like schedules and lists.
+Dimension: J (Judging)
+Scale: 1-5 (Strongly Disagree to Strongly Agree)
+
+QUESTION 57
+Even a small mistake can cause you to doubt your overall abilities and knowledge.
+Dimension: F (Feeling)
+Scale: 1-5 (Strongly Disagree to Strongly Agree)
+
+QUESTION 58
+You feel comfortable just walking up to someone you find interesting and striking up a conversation.
+Dimension: E (Extraversion)
+Scale: 1-5 (Strongly Disagree to Strongly Agree)
+
+QUESTION 59
+You are not too interested in discussing various interpretations and analyses of creative works.
+Dimension: S (Sensing)
+Scale: 1-5 (Strongly Disagree to Strongly Agree)
+
+QUESTION 60
+You are more inclined to follow your head than your heart.
+Dimension: T (Thinking)
+Scale: 1-5 (Strongly Disagree to Strongly Agree)
+
+==========================================
+END OF JUNGIAN 16-TYPE TEST
+Total Questions: 60
+
